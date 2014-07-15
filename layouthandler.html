@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+			<title>Layout</title>
+			<link rel="stylesheet" href="/style.css"></link>
+		</meta>
+	</head>
+	<body>
+
+		<script src="/jquery.js"></script>
+		<script src="/Seed.js"></script>
+		<script src="/Case.js"></script>
+		<script src="/Banner.js"></script>
+		<script src="/Layout.js"></script>
+		
+		
+
+		<script type="text/javascript">
+		
+
+		function getJSON (url){
+			var xmlhttp;
+			var data
+			xmlhttp = new XMLHttpRequest();
+		    xmlhttp.open("GET",url,true);
+		    xmlhttp.send();
+		    xmlhttp.onreadystatechange = function () {
+			    if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			    {   
+			         data = JSON.parse(xmlhttp.responseText);
+			    }
+		 	}
+		 	return data
+		 	console.log(data);
+		}
+
+		var cases = [];
+		var positions = [[120,15],[352,15],[589,15],[827,15],[120,362],[352,311],[589,272],[827,236],[120,563],[243,563],[386,563],[528,563],[685,563]];
+		
+		    var data;
+		    var xmlhttp;
+			xmlhttp = new XMLHttpRequest();
+		    xmlhttp.open("GET",'/CaseSettings.json',true);
+		    xmlhttp.send();
+		    xmlhttp.onreadystatechange = function () {
+			    if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			    {   
+			    	
+			        data = JSON.parse(xmlhttp.responseText);
+			        
+			    }
+		 	}
+
+		 /*À ENTRER DANS LA CONSOLE*/
+	 	/*for(var i = 0; i < 13; i++){
+			var tempCase;
+			tempCase = new Case(data['options'+i]);
+			cases.push(tempCase);
+		}var lay = new Layout({cases : cases, prefix : "berenger", positions : positions}); document.body.appendChild(lay.div);*/
+
+		 	</script>
+	</body>
+</html>

@@ -1,0 +1,23 @@
+.berenger-case-idle,.berenger-case-selected{
+	margin: 6px;
+}
+
+.berenger-case-idle{
+	border: 1px solid #000000;
+}
+
+.berenger-case-selected{
+	border: 1px solid #0000AA;
+}
+
+.berenger-layout{
+	border: 1px solid #000000;
+	width: 1080px;
+	height: 760px;
+}
+
+.berenger-banner{
+	background-color: #f17f36;
+	width: 85px;
+	height: 760px;
+}

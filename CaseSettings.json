@@ -1,0 +1,107 @@
+{
+	"options0": {
+	"width" :225,
+	"height":340,
+	"type":"img",
+	"imgSrc": "/web.png",
+	"prefix": "berenger"
+	},
+
+	"options1" : {
+	"width" :230,
+	"height":290,
+	"type":"img",
+	"imgSrc": "/pirate.png",
+	"prefix": "berenger"
+	},
+
+	"options2" : {
+	"width" :230,
+	"height":250,
+	"type":"img",
+	"imgSrc": "/rocket.jpg",
+	"prefix": "berenger"
+	},
+
+	"options3" : {
+	"width" :230,
+	"height":215,
+	"type":"img",
+	"imgSrc": "/zdp.jpg",
+	"prefix": "berenger"
+	},
+
+	"options4" : {
+	"width" :224,
+	"height":194,
+	"type":"img",
+	"imgSrc": "/bp.jpg",
+	"prefix": "berenger"
+	},
+
+	"options5" : {
+	"width" :230,
+	"height":245,
+	"type":"img",
+	"imgSrc": "/creative.jpg",
+	"prefix": "berenger"
+	},
+
+
+	"options6" : {
+	"width" :230,
+	"height":284,
+	"type":"img",
+	"imgSrc": "/dessin.jpg",
+	"prefix": "berenger"
+	},
+
+	"options7" : {
+	"width" :230,
+	"height":320,
+	"type":"img",
+	"imgSrc": "/egg.jpg",
+	"prefix": "berenger"
+	},
+
+	"options8" : {
+	"width" :115,
+	"height":175,
+	"type":"img",
+	"imgSrc": "/future.png",
+	"prefix": "berenger"
+	},
+
+	"options9" : {
+	"width" :135,
+	"height":175,
+	"type":"img",
+	"imgSrc": "/thinking.png",
+	"prefix": "berenger"
+	},
+
+	"options10" : {
+	"width" :135,
+	"height":175,
+	"type":"img",
+	"imgSrc": "/w.jpg",
+	"prefix": "berenger"
+	},
+
+	"options11" : {
+	"width" :150,
+	"height":175,
+	"type":"img",
+	"imgSrc": "/nasa.jpg",
+	"prefix": "berenger"
+	},
+
+	"options12" : {
+	"width" :372,
+	"height":175,
+	"type":"img",
+	"imgSrc": "/process.png",
+	"prefix": "berenger"
+	}
+
+}
