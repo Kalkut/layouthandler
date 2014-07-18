@@ -45,6 +45,14 @@ var serveur =  http.createServer(function (req,res) {
   		console.log(req.url.split(".")[0]);
   })
 	}
+	else if (req.url.split(".")[1] === 'gif') {
+		//console.log(req.url.split(".")[0]);
+		fs.readFile('img' + req.url.split(".")[0]  +".gif", function (err, data) {
+  	if (err) throw err;
+  		res.end(data);
+  		console.log(req.url.split(".")[0]);
+  })
+	}
 	else if (req.url.split(".")[1] === 'json') {
 		res.writeHead(200,{"Content-Type": "text/json"})
 		res.write(fs.readFileSync("." + req.url.split(".")[0]  +".json"))
