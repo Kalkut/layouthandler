@@ -12,6 +12,7 @@
 		<script src="/Seed.js"></script>
 		<script src="/Case.js"></script>
 		<script src="/Banner.js"></script>
+		<script src="/Slide.js"></script>
 		<script src="/Layout.js"></script>
 		<script src="/Layouts.js"></script>
 		
@@ -55,7 +56,10 @@
 			    }
 		 	}
 
-		var lay = new Layouts({prefix : "berenger", imgSrcs : imgSrcs, margin : 10, type : "moods" }); document.body.appendChild(lay.layout.div);
+		var lay = new Layouts({prefix : "berenger", imgSrcs : imgSrcs, margin : 10, type : "moods" }); 
+		for(var i = 0, n = lay.layout.slides.length; i < n; i++){
+			document.body.appendChild(lay.layout.slides[i].el)
+		}
 
 		 	</script>
 	</body>

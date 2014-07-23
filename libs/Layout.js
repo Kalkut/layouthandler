@@ -19,12 +19,6 @@ var positions = {
 
 
 var Layout = Seed.extend({
-	/*tpl : function() {
-	return {
-		tag : '.' + options.prefix + '-layout'
-		style : 'position:absolute;width:1080;'
-	}
-},*/
 
 	'+options' : {
 		imgSrcs : '',
@@ -54,8 +48,9 @@ var Layout = Seed.extend({
 		this.cases = []
 		this.type = options.type;
 		this.positions = options.positions || null;
-		
-		this.div = toDOM({
+		this.slides = [];
+
+		this.el = toDOM({
 			tag : "div." + options.prefix + "-layout",
 			style : {
 				width : 1090,
@@ -74,14 +69,20 @@ var Layout = Seed.extend({
 			this.banner = new Banner({side : "up", prefix : options.prefix, imgButton : '/white.png'});
 		}
 		
-		this.div.appendChild(this.banner.div);
+		this.el.appendChild(this.banner.div);
 		this.banner.div.appendChild(this.menu)
 
-		
+		this.slides.push(this);
+		//this.
 
 		for( var i = 0, n = this.positions.length; i < n; i++){
-			var tempCase = new Case({ width : this.positions[i][2], height : this.positions[i][3], type : 'img', imgSrc : options.imgSrcs[i], prefix : options.prefix})
+			var tempCase = new Case({ width : this.positions[i][2], height : this.positions[i][3], type : i === 5 ? 'txt' : 'img', imgSrc : options.imgSrcs[i], prefix : options.prefix})
+			var tempSlide = new Slide({ logo : "/future.png",type : this.type, title : options.title || "Yeepeekai mothafucker",prefix : "berenger",width : 1100, height : 750 , box : {prefix : "berenger", width : 700, height : 600, imgSrc : options.imgSrcs[i+1]}})
+			tempSlide.hide();
+			this.slides.push(tempSlide);
 			this.cases.push(tempCase);
+			
+
 			this.cases[i].selected = false;
 			this.cases[i].div.style.left =  this.positions[i][0];
 			this.cases[i].div.style.top = this.positions[i][1];
@@ -91,8 +92,35 @@ var Layout = Seed.extend({
 			this.cases[i].on('imgMoved', function (i,x,y,z) {
 				this.fire('anImgMoved',x,y,z,i);
 			}.bind(this).curry(i))
-			this.div.appendChild(this.cases[i].div);
+			if(this.cases[i].type === 'txt') this.cases[i].on('titleChanged', function (title) {
+				this.fire('changeTheTitleEverywhere',title);
+			}.bind(this))
+			this.el.appendChild(this.cases[i].div);
 		}
+		
+		this.curSlide = 0;
+		
+		document.body.addEventListener("keydown", function (e) {
+				console.log(this.curSlide)
+				if(e.keyCode === 37){
+					this.slides[this.curSlide].hide();
+					this.curSlide--
+					this.slides[this.curSlide].show();
+					console.log(this.curSlide)
+				}
+				else if(e.keyCode === 39){
+					this.slides[this.curSlide].hide();
+					this.curSlide++;
+					this.slides[this.curSlide].show();
+					console.log(this.curSlide)
+				}
+			}.bind(this))
+
+		this.on('changeTheTitleEverywhere', function (title){
+			for(var i = 0, n = this.positions.length; i < n; i++){
+				this.slides.el.children[1].innerHTML = title
+			}
+		}.bind(this))
 
 		if(options[this.type]){
 			for(var indice in options[this.type]){
