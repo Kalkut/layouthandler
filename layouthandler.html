@@ -1,66 +1,63 @@
 <html>
-	<head>
-		<meta charset="utf-8">
-			<title>Layout</title>
-			<link rel="stylesheet" href="/style.css"></link>
-		</meta>
-	</head>
-	<body>
+<head>
+	<meta charset="utf-8">
+	<title>Layout</title>
+	<link rel="stylesheet" href="/style.css"></link>
+</meta>
+</head>
+<body>
 
-		<script src="/jquery.js"></script>
-		<script src="/toDOM.js"></script>
-		<script src="/Seed.js"></script>
-		<script src="/Case.js"></script>
-		<script src="/Banner.js"></script>
-		<script src="/Slide.js"></script>
-		<script src="/Layout.js"></script>
-		<script src="/Layouts.js"></script>
-		
+	<script src="/jquery.js"></script>
+	<script src="/toDOM.js"></script>
+	<script src="/Seed.js"></script>
+	<script src="/Case.js"></script>
+	<script src="/Banner.js"></script>
+	<script src="/Slide.js"></script>
+	<script src="/Layout.js"></script>
+	<script src="/Layouts.js"></script>
 
-		<script type="text/javascript">
-		
 
-		function getJSON (url){
-			var xmlhttp;
-			var data
-			xmlhttp = new XMLHttpRequest();
-		    xmlhttp.open("GET",url,true);
-		    xmlhttp.send();
-		    xmlhttp.onreadystatechange = function () {
-			    if (xmlhttp.readyState==4 && xmlhttp.status==200)
-			    {   
-			         data = JSON.parse(xmlhttp.responseText);
-			    }
-		 	}
-		 	return data
-		 	console.log(data);
+	<script type="text/javascript">
+
+
+	function getJSON (url){
+		var xmlhttp;
+		var data
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send();
+		xmlhttp.onreadystatechange = function () {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{   
+				data = JSON.parse(xmlhttp.responseText);
+			}
 		}
+		return data
+		console.log(data);
+	}
 
-		var imgSrcs = ["/web.png","/pirate.png","/rocket.jpg","/zdp.jpg","/bp.jpg","/creative.jpg","/dessin.jpg","/egg.jpg","/future.png","/thinking.png","/w.jpg","/nasa.jpg","/process.png"]
-		var cases = [];
+	var imgSrcs = ["/web.png","/pirate.png","/rocket.jpg","/zdp.jpg","/bp.jpg","/creative.jpg","/dessin.jpg","/egg.jpg","/future.png","/thinking.png","/w.jpg","/nasa.jpg","/process.png"]
+	var cases = [];
 		//var positions = [[120,15],[352,15],[589,15],[827,15],[120,362],[352,311],[589,272],[827,236],[120,563],[243,563],[386,563],[528,563],[685,563]]; marge de 6
 		//var margin = 15;
 		//var positions = [[120,15],[346 + margin,15],[578 + 2*margin,15],[810 + 3*margin,15],[120,356 + margin],[346 + margin,305 + margin],[578 + 2*margin,266 + margin],[810 + 3*margin,230 + margin],[120,552 + 2*margin],[240 + margin,552 + 2*margin],[379 + 2*margin,552 + 2*margin],[516 + 3*margin,552 + 2*margin],[668 + 4*margin,552 + 2*margin]];
 
-		    var data;
-		    var xmlhttp;
-			xmlhttp = new XMLHttpRequest();
-		    xmlhttp.open("GET",'/CaseSettings.json',true);
-		    xmlhttp.send();
-		    xmlhttp.onreadystatechange = function () {
-			    if (xmlhttp.readyState==4 && xmlhttp.status==200)
-			    {   
-			    	
-			        data = JSON.parse(xmlhttp.responseText);
-			        
-			    }
-		 	}
+		var data;
+		var xmlhttp;
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.open("GET",'/CaseSettings.json',true);
+		xmlhttp.send();
+		xmlhttp.onreadystatechange = function () {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{   
 
-		var lay = new Layouts({prefix : "berenger", imgSrcs : imgSrcs, margin : 10, type : "moods" }); 
-		for(var i = 0, n = lay.layout.slides.length; i < n; i++){
-			document.body.appendChild(lay.layout.slides[i].el)
+				data = JSON.parse(xmlhttp.responseText);
+
+			}
 		}
 
-		 	</script>
+		var lay = new Layouts({prefix : "berenger", imgSrcs : imgSrcs, margin : 10, type : "moods" }); 
+		document.body.appendChild(lay.layout.elt)
+		</script>
 	</body>
-</html>
+	</html>

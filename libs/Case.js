@@ -1,16 +1,16 @@
 var onimagesload = function (imgs,callback) {
-    	var l = imgs.length;
-    	var c = 0;
-    	for (var i = 0; i < l; i++){
-    		if(imgs[i].loaded) c++;
-    		else imgs[i].onload = function () {
-    			c++;
-    			if (c === l) callback();
-    		}
-    	}
+	var l = imgs.length;
+	var c = 0;
+	for (var i = 0; i < l; i++){
+		if(imgs[i].loaded) c++;
+		else imgs[i].onload = function () {
+			c++;
+			if (c === l) callback();
+		}
+	}
 
-    	if (c === l) callback();
-    }
+	if (c === l) callback();
+}
 
 var Case = Seed.extend({
 	'+options' : {
@@ -38,9 +38,10 @@ var Case = Seed.extend({
 
 		if(this.type === 'txt') {
 			this.div.contentEditable = true;
-			this.div.onkeydown = function () {
+			this.div.onkeyup = function () {
+				console.log(this);
 				this.fire("titleChanged",this.div.innerHTML);
-			}
+			}.bind(this)
 		} else if (this.type === 'img') {
 			this.div.appendChild(this.img);
 			this.clicking;
@@ -71,7 +72,6 @@ var Case = Seed.extend({
 						length-=5;
 						if(length > parseInt(this.div.style.width) && length*this.img.ratio > parseInt(this.div.style.height)) this.zoom(length);
 					}
-					console.log(parseInt(this.img.style.width),parseInt(this.img.style.height));
 				}
 			}.bind(this));
 			
@@ -82,10 +82,10 @@ var Case = Seed.extend({
 					this.img.style.left = Math.max((Math.min(parseInt(this.img.style.left) + deltaX,0)),-Math.abs(parseInt(this.img.style.width)-parseInt(this.div.style.width)));
 					this.img.style.top = Math.max(Math.min(parseInt(this.img.style.top)+ deltaY,0),-Math.abs(parseInt(this.img.style.height)-parseInt(this.div.style.height)));
 					this.fire('imgMoved',this.img.style.left,this.img.style.top,this.z);
-			}
-			this.posClick[0] = e.clientX - this.img.width/2;
-			this.posClick[1] = e.clientY- this.img.height/2;
-			
+				}
+				this.posClick[0] = e.clientX - this.img.width/2;
+				this.posClick[1] = e.clientY- this.img.height/2;
+				
 			}.bind(this)
 
 			onimagesload([this.img],imgMove.bind(this))
