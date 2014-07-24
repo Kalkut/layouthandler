@@ -83,18 +83,20 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 				this.positions = positions.moods
 				this.banner = new Banner({
 					side: "left",
-					prefix: options.prefix
+					prefix: options.prefix,
+					logo : options.logo
 				});
 			} else if (this.type = 'stories') {
 				this.positions = positions.stories;
 				this.banner = new Banner({
 					side: "up",
-					prefix: options.prefix
+					prefix: options.prefix,
+					logo : options.logo
 				});
 			}
 
 			this.el.appendChild(this.banner.div);
-			this.banner.div.appendChild(this.menu);
+			this.banner.band.appendChild(this.menu);
 			this.slides.push(this);
 
 

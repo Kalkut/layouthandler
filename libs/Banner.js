@@ -1,4 +1,5 @@
-sand.define('Banner',function(){
+sand.define('Banner',['Case'], function (r) {
+	var Case = r.Case;
 	return Seed.extend({
 		'+init' : function (options) {
 			this.side = options.side;
@@ -12,13 +13,33 @@ sand.define('Banner',function(){
 			this.div.style.width = 85;
 			this.div.style.height = 760;
 			this.div.style.left = 20;
-			this.div.style.backgroundColor = "#f17f36";
+			
+			this.box = new Case({ width : 85 , height : 85 , prefix : "berenger", imgSrc : options.logo, type : "img"})
+			this.band = document.createElement('div');
+			this.band.style.height = 665;
+			this.band.style.backgroundColor = "#f17f36";
+			
+			this.box.div.style.left = -6;
+			this.box.div.style.top = 660
+			this.div.appendChild(this.band);
+			this.div.appendChild(this.box.div);
 		}
 		else if (this.side === 'up'){
 			this.div.style.width = 1080;
 			this.div.style.height = 85;
 			this.div.style.top = 20;
-			this.div.style.backgroundColor = "8c8fc2";
+			
+			this.band = document.createElement('div');
+			this.band.style.width = 880;
+			this.band.style.height = 85;
+			this.band.style.backgroundColor = "8c8fc2";
+
+			this.box = new Case({ width : 183 , height : 87 , prefix : "berenger", imgSrc : options.logo, type : "img"})
+			this.box.div.style.left = 880;
+			this.box.div.style.top = -8;
+			this.div.appendChild(this.band);
+			this.div.appendChild(this.box.div);
+
 		}
 		this.div.className = options.prefix + "-banner";
 		

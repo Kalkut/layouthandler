@@ -18,7 +18,7 @@ sand.define('Layouts',['Layout'], function (r) {
 			} else if (type === "moods"){
 				this.layout.cases[5].div.innerHTML = this.title;
 			}
-			this.layout.fire('changeTheTitleEverywhere',this.title);
+			this.layout.fire('changeTheTitleEverywhere',this.title||"");
 		}.bind(this))
 
 		
