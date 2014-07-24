@@ -7,11 +7,33 @@ sand.define('Slide',['Case'], function (r) {
 		/*Revoir la structure HTML */
 		'+init' : function (options) {
 			this.box = new Case(options.box);
+			this.box.div.id = "pic";
+			this.box.div.addEventListener("mousedown", function () {
+					this.fire('selection', "pic");
+				}.bind(this))
+
 			this.type = options.type;
 			var that = this;
 			var scp = {};
 			this.texte;
 
+			this.logoBox =  new Case({ width : options.width*0.17 , height : options.height*0.108 , prefix : "berenger", imgSrc : options.logo, type : "img"})
+			this.logoBox.div.style.cssFloat = "left";
+			this.logoBox.div.id = "logo";
+			this.logoBox.div.addEventListener("mousedown", function () {
+					this.fire('selection', "logo");
+				}.bind(this))
+
+			this.on('selection', function (logoOrPic){
+				if(logoOrPic === 'logo'){
+					this.box.selected = false;
+					this.logoBox.selected = true;
+				}else{
+					this.logoBox.selected = false;
+					this.box.selected = true;
+				}
+			})
+			
 			this.el = toDOM({
 				tag : 'div.' + options.prefix + "-slide",
 				style : {
@@ -22,7 +44,7 @@ sand.define('Slide',['Case'], function (r) {
 
 				children : [
 
-				{
+				/*{
 					tag : 'img.' + options.prefix + "-logo",
 					attr : {
 						width : options.width*0.17,
@@ -33,16 +55,19 @@ sand.define('Slide',['Case'], function (r) {
 						cssFloat : "left",
 							//border : "1px solid #000000"
 						}
-					},
+					}*/
+
+					this.logoBox.div
+					,
 					
 					{
 						tag : 'div.' + options.prefix + "-title",
 						style : {
 							width : options.width*0.66,
 							height : options.height*0.108,
-							cssFloat : "left",
+							left : options.width*0.17,
 							fontSize : 30,
-							//color : "#f17f37",
+							position : "absolute",
 							textAlign : "center"
 						},
 						attr : {
@@ -62,7 +87,7 @@ sand.define('Slide',['Case'], function (r) {
 						style : {
 							width : options.width*0.16,
 							height : options.height*0.108,
-							cssFloat : "left",
+							cssFloat : "right",
 							//border : "1px solid #000000"
 						}
 					}	
@@ -100,6 +125,7 @@ if(this.type === 'moods'){
 
 	this.box.div.style.top = (parseInt(options.height) - parseInt(this.box.div.style.height))/2;
 	this.box.div.style.left = (parseInt(options.width) - parseInt(this.box.div.style.width))/2;
+			
 
 	this.desc.style.left = parseInt(this.box.div.style.left) - parseInt(this.desc.style.width)*0.12;
 	this.desc.style.top = parseInt(this.box.div.style.top) + parseInt(this.box.div.style.height) - parseInt(this.desc.style.height)*0.33;
