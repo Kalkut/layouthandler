@@ -1,9 +1,11 @@
-var Layouts = Seed.extend({
+sand.define('Layouts',['Layout'], function (r) {
+	var Layout = r.Layout;
+	return Layouts = Seed.extend({
 
-	'+init' : function (options) {
-		this.options = options;
-		this.toLayout();
-		this.title;
+		'+init' : function (options) {
+			this.options = options;
+			this.toLayout();
+			this.title;
 		//this.position = {};
 		//this.position[this.layout.type] = [];
 
@@ -34,7 +36,7 @@ var Layouts = Seed.extend({
 			this.layout = this.create(Layout,this.options);
 			daddy.appendChild(this.layout.elt);
 		}else{
-			this.layout = new Layout(this.options);
+			this.layout = this.create(Layout,this.options);
 		}
 
 		this.layout.on('anImgMoved', function (x,y,z,i) {
@@ -65,4 +67,5 @@ var Layouts = Seed.extend({
 	}
 
 
+})
 })

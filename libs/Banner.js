@@ -1,7 +1,8 @@
-var Banner = Seed.extend({
-	'+init' : function (options) {
-		this.side = options.side;
-		this.div = document.createElement('div');
+sand.define('Banner',function(){
+	return Seed.extend({
+		'+init' : function (options) {
+			this.side = options.side;
+			this.div = document.createElement('div');
 
 		/*this.imgButton.onclick = function () {
 			this.fire('changeLayout', )
@@ -23,4 +24,5 @@ var Banner = Seed.extend({
 		
 		this.div.style.position = "absolute";
 	}
+})
 })
