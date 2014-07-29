@@ -39,7 +39,7 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 	var Banner = r.Banner;
 	var Case = r.Case;
 
-	return Layout = Seed.extend({
+	return Seed.extend({
 
 		'+options': {
 			imgSrcs: '',
@@ -101,7 +101,7 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 
 
 			for (var i = 0, n = this.positions.length; i < n; i++) {
-
+				
 				if (this.type === 'moods') {
 					var tempCase = new Case({
 						width: this.positions[i][2],
@@ -119,10 +119,11 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 						height: 750,
 						box: {
 							prefix: "berenger",
-							width: 700,
-							height: 600,
+							width: 650,
+							height: 575,
 							imgSrc: options.imgSrcs[i],
-							type: 'img'
+							type: 'img',
+							fit : true
 						}
 					})
 				} else if (this.type === 'stories') {
@@ -145,16 +146,28 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 							width: 700,
 							height: 600,
 							imgSrc: options.imgSrcs[i],
-							type: 'img'
+							type: 'img',
+							fit : true,
 						}
 					})
 				}
 
 				tempSlide.hide();
+				
+				for(var k = 0, l = tempSlide.cases.length; k < l; k++){
+					tempSlide.cases[k].on('imgMoved', function (k , i, x, y, z) {
+						this.fire('anImgMoved', x, y, z, k, i);
+					}.bind(this).curry(k,i+1))
+				}
+				
 				tempSlide.on('changeSlidesTitle', function (title) {
 					this.fire('changeTheTitleEverywhere', title);
 				}.bind(this))
-				if (tempCase.type = 'img') this.slides.push(tempSlide);
+				
+				if (tempCase.type = 'img'){
+					this.slides.push(tempSlide);
+				} 
+				
 				this.cases.push(tempCase);
 
 				this.cases[i].selected = false;
@@ -164,11 +177,11 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 					this.fire('selection', i);
 				}.bind(this).curry(i))
 				this.cases[i].on('imgMoved', function (i, x, y, z) {
-					this.fire('anImgMoved', x, y, z, i);
+					this.fire('anImgMoved', x, y, z, i, 0);
 				}.bind(this).curry(i))
 				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
 					tempCase.on('titleChanged', function (title) {
-						console.log('qui a raison');
+						console.log(title)
 						this.fire('changeTheTitleEverywhere', title);
 					}.bind(this))
 				}
@@ -191,9 +204,9 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 
 			this.on('changeTheTitleEverywhere', function (title) {
 				if (this.type === 'moods') {
-					this.slides[0].cases[5].div.innerHTML = title
+					this.slides[0].cases[5].txtBloc.children[0].children[0].children[0].innerHTML = title
 				} else if (this.type === 'stories') {
-					this.slides[0].cases[3].div.innerHTML = title
+					this.slides[0].cases[3].txtBloc.children[0].children[0].children[0].innerHTML = title
 				}
 				for (var i = 1, n = this.slides.length; i < n; i++) {
 					this.slides[i].el.children[1].innerHTML = title;
@@ -202,10 +215,12 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 			}.bind(this))
 
 			if (options[this.type]) {
-				for (var indice in options[this.type]) {
-					console.log(parseInt(indice));
-					this.cases[parseInt(indice)].img.style.left = options[this.type][indice][0];
-					this.cases[parseInt(indice)].img.style.top = options[this.type][indice][1]
+				for(var indiceSlides in options[this.type]){
+					for (var indice in options[this.type][indiceSlides]) {
+						console.log(parseInt(indice));
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options[this.type][indiceSlides][indice][0];
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options[this.type][indiceSlides][indice][1]
+					}
 				}
 			}
 

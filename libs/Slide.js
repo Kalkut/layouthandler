@@ -9,20 +9,23 @@ sand.define('Slide',['Case'], function (r) {
 			this.box = new Case(options.box);
 			this.box.div.id = "pic";
 			this.box.div.addEventListener("mousedown", function () {
-					this.fire('selection', "pic");
-				}.bind(this))
+				this.fire('selection', "pic");
+			}.bind(this))
 
 			this.type = options.type;
 			var that = this;
 			var scp = {};
 			this.texte;
 
-			this.logoBox =  new Case({ width : options.width*0.17 , height : options.height*0.108 , prefix : "berenger", imgSrc : options.logo, type : "img"})
+
+			this.logoBox =  new Case({ width : options.width*0.17 , height : options.height*0.108 , prefix : "berenger", imgSrc : options.logo, type : "img", fit : true})
 			this.logoBox.div.style.cssFloat = "left";
 			this.logoBox.div.id = "logo";
 			this.logoBox.div.addEventListener("mousedown", function () {
-					this.fire('selection', "logo");
-				}.bind(this))
+				this.fire('selection', "logo");
+			}.bind(this))
+
+			this.cases = [this.box,this.logoBox];
 
 			this.on('selection', function (logoOrPic){
 				if(logoOrPic === 'logo'){
@@ -66,9 +69,9 @@ sand.define('Slide',['Case'], function (r) {
 							width : options.width*0.66,
 							height : options.height*0.108,
 							left : options.width*0.17,
-							fontSize : 30,
 							position : "absolute",
-							textAlign : "center"
+							textAlign : "center",
+							outline : "none"
 						},
 						attr : {
 							contenteditable : true
@@ -83,69 +86,85 @@ sand.define('Slide',['Case'], function (r) {
 					},
 
 					{
-						tag : 'div.' + options.prefix + "-list",
+						tag : 'div.' + options.prefix + "-menu",
 						style : {
 							width : options.width*0.16,
 							height : options.height*0.108,
-							cssFloat : "right",
-							//border : "1px solid #000000"
+							position : "absolute",
+							left : options.width*0.83
 						}
 					}	
 					]
 				}, scp)
 
 if(this.type === 'moods'){
-	this.desc = toDOM({
+	var box = this.box.div;
 
-		tag : 'div.' + options.prefix + "-desc",
-
+	this.bloc = toDOM({
+		tag : 'div.' + options.prefix +'-bloc',
 		style : {
-			opacity : "0.7",
-			backgroundColor : "#000000",
-			width : 380,
-			height : 80,
-			fontSize : 18,
-			position : "absolute",
-			color : "#FFFFFF",
-			zIndex : 1
+			width : box.style.width,
+			height : box.style.width,
+			position : "absolute"
 		},
 
-		attr : {
-			contenteditable : true
-		},
+		children : [
 
-		event : {
-			keyup : function() {
-				this.texte = this.desc.innerHTML
-			}.bind(this)
+		box,
+		{
+			tag : 'div.' + options.prefix + "-desc",
+
+			style : {
+				opacity : "0.7",
+				backgroundColor : "#000000",
+				width : 380,
+				height : 50,
+				position : "absolute",
+				zIndex : 1
+			},
+
+			attr : {
+				contenteditable : true
+			},
+
+			event : {
+				keyup : function() {
+					this.texte = this.desc.innerHTML
+				}.bind(this)
+			}
 		}
+		]
 	})
 
-	this.el.appendChild(this.desc)
+	this.bloc.style.top = (parseInt(options.height) - parseInt(this.box.div.style.height))/2;
+	this.bloc.style.left = (parseInt(options.width) - parseInt(this.box.div.style.width))/2;
 
-	this.box.div.style.top = (parseInt(options.height) - parseInt(this.box.div.style.height))/2;
-	this.box.div.style.left = (parseInt(options.width) - parseInt(this.box.div.style.width))/2;
-			
-
-	this.desc.style.left = parseInt(this.box.div.style.left) - parseInt(this.desc.style.width)*0.12;
-	this.desc.style.top = parseInt(this.box.div.style.top) + parseInt(this.box.div.style.height) - parseInt(this.desc.style.height)*0.33;
+	this.box.on('update:position',function (x,y,iWidth,iHeight) {
+		this.bloc.children[1].style.left = Math.min(Math.max(x - 50,-50),parseInt(this.box.div.style.width));
+		this.bloc.children[1].style.top =  Math.max(Math.min(y + iHeight - 50,parseInt(this.box.div.style.height)-50), - 50);
+		console.log(this.bloc.children[1].style.left,this.bloc.children[1].style.top)
+		console.log(x,y,iWidth,iHeight);
+		//console.log(this.bloc.style.height);
+	}.bind(this));
 
 	this.el.children[1].style.color = "#f17f37";
-	this.el.appendChild(this.box.div)
+	this.el.appendChild(this.bloc)
 }
 else if (this.type === 'stories') {
 	this.box.div.style.left = this.box.div.style.top = 100;
 	this.el.children[1].style.color = "#8c8fc2";
+	var boxWidth = parseInt(this.box.div.style.width);
 
 	this.bulletPoint = toDOM({
 		tag : 'div.' + options.prefix + "-list",
 		style : {
-			cssFloat : "right",
+			position : "absolute",
 			width : 200,
 			height : 600,
-						//border : "1px solid #000000"
-					}
-				})
+			top : 100,
+			left : 150 + boxWidth
+		}
+	})
 
 	var nbLines = 0;
 	var maxLines = 4;

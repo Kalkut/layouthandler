@@ -1,6 +1,6 @@
 sand.define('Layouts',['Layout'], function (r) {
 	var Layout = r.Layout;
-	return Layouts = Seed.extend({
+	return Seed.extend({
 
 		'+init' : function (options) {
 			this.options = options;
@@ -14,9 +14,9 @@ sand.define('Layouts',['Layout'], function (r) {
 			console.log(this.title)
 			this.toLayout(type);
 			if(type === "stories"){
-				this.layout.cases[3].div.innerHTML = this.title;
+				this.layout.cases[3].txtBloc.children[0].children[0].children[0].innerHTML = this.title;
 			} else if (type === "moods"){
-				this.layout.cases[5].div.innerHTML = this.title;
+				this.layout.cases[5].txtBloc.children[0].children[0].children[0].innerHTML = this.title;
 			}
 			this.layout.fire('changeTheTitleEverywhere',this.title||"");
 		}.bind(this))
@@ -39,10 +39,14 @@ sand.define('Layouts',['Layout'], function (r) {
 			this.layout = this.create(Layout,this.options);
 		}
 
-		this.layout.on('anImgMoved', function (x,y,z,i) {
-			var indice = i.toString();
+		this.layout.on('anImgMoved', function (x,y,z,i , k) {
+			//var indice = i.toString();
 			if(this.options[this.layout.type] || this.options[this.layout.type] === {}){
-				this.options[this.layout.type][i] = [x,y,z];
+				if(this.options[this.layout.type][k] || this.options[this.layout.type][k] === {}){
+				this.options[this.layout.type][k][i] = [x,y,z];
+			}else{
+				this.options[this.layout.type][k] = {};
+			}
 			}else{
 				this.options[this.layout.type] = {};
 			}
@@ -50,7 +54,7 @@ sand.define('Layouts',['Layout'], function (r) {
 	},
 
 	saveImgPositions : function () {
-		for(var i = 0, n = this.layout.cases.length ; i < n; i++){
+			for(var i = 0, n = this.layout.cases.length ; i < n; i++){
 			this.position[this.layout.type].push([this.layout.cases[i].img.style.left , this.layout.cases[i].img.style.top])
 		}
 	},

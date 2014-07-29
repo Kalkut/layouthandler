@@ -29,6 +29,14 @@ var serveur =  http.createServer(function (req,res) {
 			console.log(req.url.split(".")[0]);
 		})
 	}
+	else if (req.url.split(".")[1] === 'woff') {
+		//console.log(req.url.split(".")[0]);
+		fs.readFile('style' + req.url.split(".")[0]  +".woff", function (err, data) {
+			if (err) throw err;
+			res.end(data);
+			console.log(req.url.split(".")[0]);
+		})
+	}
 	else if (req.url.split(".")[1] === 'png') {
 		//console.log(req.url.split(".")[0]);
 		fs.readFile('img' + req.url.split(".")[0]  +".png", function (err, data) {

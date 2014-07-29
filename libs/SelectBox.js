@@ -1,7 +1,8 @@
 sand.define('ressources/Selectbox', [
   'ressources/Toggle',
   'DOM/toDOM',
-  'DOM/parents'
+  'DOM/parents',
+  'ressources/where'
 ], function(r) {
   
   return r.Toggle.extend({
