@@ -37,27 +37,12 @@ sand.define('Case', function (r) {
 					width : options.width,
 					height : options.height,
 					outline : "none",
-				},
-				events : {
-					/*keyup : function(e) {
-						e.preventDefault();
-					},
-					/*keydown : function (e){
-						e.preventDefault();
-					},*/
-					/*keypress : function (e){
-						e.preventDefault();
-					},*/
 				}
-
 			})
 
 			if(this.type === 'txt') {
 				this.txtBloc = toDOM({
 					tag : 'table.' + options.prefix + "-case",
-					attr : {
-						tabindex : "1",
-					},
 					children : [
 					{
 						tag : 'tr.' + options.prefix + "-case",
@@ -69,22 +54,19 @@ sand.define('Case', function (r) {
 								tag : 'div.' + options.prefix + "-case",
 								events : {
 									keyup : function () {
-										console.log(this.txtBloc.children[0].children[0].children[0].innerHTML);
-									//e.preventDefault();
-									this.fire('titleChanged',this.txtBloc.children[0].children[0].children[0].innerHTML);
-									
-								}.bind(this),
-								
+										this.fire('titleChanged',this.txtBloc.children[0].children[0].children[0].innerHTML);
+									}.bind(this),
+
+								},
+								attr : {
+									contenteditable : true,
+								}
 							},
-							attr : {
-								contenteditable : true,
-							}
-						},
+							]
+						}
 						]
-					}
-					]
-				}],
-			})
+					}],
+				})
 
 				this.div.appendChild(this.txtBloc);
 
@@ -104,17 +86,17 @@ sand.define('Case', function (r) {
 					this.clicking = false
 				}.bind(this)
 
-				this.div.onmouseout = function (){
+				this.div.onmouseout = function () {
 					this.clicking = false;
 				}.bind(this);
 				
-				document.body.addEventListener('keydown',function(e){
-					if(this.selected){
+				document.body.addEventListener('keydown',function (e) {
+					if(this.selected) {
 						var length = parseInt(this.img.style.width);
-						if(e.keyCode === 107){
+						if(e.keyCode === 107) {
 							length+=5;
 							this.zoom(length);
-						}else if(e.keyCode === 109){
+						} else if(e.keyCode === 109) {
 							length-=5;
 							if((length > parseInt(this.div.style.width) && length*this.img.ratio > parseInt(this.div.style.height)) || this.fit) this.zoom(length);
 						}
@@ -124,11 +106,11 @@ sand.define('Case', function (r) {
 				var imgMove = function (e) {
 					var deltaX = e.clientX - this.img.width/2 - this.posClick[0];
 					var deltaY = e.clientY- this.img.height/2 - this.posClick[1];
-					if(this.clicking){
-						if (!this.fit){
+					if(this.clicking) {
+						if (!this.fit) {
 							this.img.style.left = Math.max((Math.min(parseInt(this.img.style.left) + deltaX,0)),-Math.abs(parseInt(this.img.style.width)-parseInt(this.div.style.width)));
 							this.img.style.top = Math.max(Math.min(parseInt(this.img.style.top)+ deltaY,0),-Math.abs(parseInt(this.img.style.height)-parseInt(this.div.style.height)));
-						}else{
+						}else {
 							this.img.style.left = Math.max(Math.min(parseInt(this.div.style.width),parseInt(this.img.style.left) + deltaX),-Math.min(parseInt(this.div.style.width)));
 							this.img.style.top = Math.max(Math.min(parseInt(this.div.style.height),parseInt(this.img.style.top) + deltaY),-Math.min(parseInt(this.div.style.height)));
 						}
@@ -161,7 +143,7 @@ sand.define('Case', function (r) {
 			}	
 		},
 
-		zoom : function (newLength,widthOrHeight){
+		zoom : function (newLength,widthOrHeight) {
 			if(!widthOrHeight) {
 				this.img.style.width = newLength;
 				this.img.style.height = Math.floor(newLength*this.img.ratio);

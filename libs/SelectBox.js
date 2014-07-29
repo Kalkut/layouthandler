@@ -31,7 +31,7 @@ sand.define('ressources/Selectbox', [
           { tag : '.fake ' + this.current.label, events : { click : this.onClick.bind(this) } },
           ['.items', this.choices.map(function(e) {
               return {
-               tag : '.item' + (e.disabled ? '.disabled ' : ' ') + e.label,
+               tag : '.item.' + e.id + (e.disabled ? '.disabled ' : ' ') + e.label,
                style : {
                 display : this.current.id === e.id ? 'none' : 'block'
                },
@@ -116,7 +116,7 @@ sand.define('ressources/Selectbox', [
               { tag : '.fake ' + this.current.label, events : { click : this.onClick.bind(this) } },
               ['.items', this.choices.map(function(e) {
                   return {
-                   tag : '.item' + (e.disabled ? '.disabled ' : ' ') + e.label,
+                   tag : '.item.' + e.id + (e.disabled ? '.disabled ' : ' ') + e.label,
                    as : e.id,
                    style : {
                     display : this.current.id === e.id ? 'none' : 'block'

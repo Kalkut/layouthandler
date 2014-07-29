@@ -1,10 +1,9 @@
-sand.define('Slide',['Case'], function (r) {
-
-	var Case = r.Case
+sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
+	var Selectbox = r.Selectbox;
+	var Case = r.Case;
+	
 	return Seed.extend({
 
-
-		/*Revoir la structure HTML */
 		'+init' : function (options) {
 			this.box = new Case(options.box);
 			this.box.div.id = "pic";
@@ -27,7 +26,7 @@ sand.define('Slide',['Case'], function (r) {
 
 			this.cases = [this.box,this.logoBox];
 
-			this.on('selection', function (logoOrPic){
+			this.on('selection', function (logoOrPic) {
 				if(logoOrPic === 'logo'){
 					this.box.selected = false;
 					this.logoBox.selected = true;
@@ -47,145 +46,178 @@ sand.define('Slide',['Case'], function (r) {
 
 				children : [
 
-				/*{
-					tag : 'img.' + options.prefix + "-logo",
-					attr : {
-						width : options.width*0.17,
-						height : options.height*0.108,
-						src : options.logo || null
-					},
-					style : {
-						cssFloat : "left",
-							//border : "1px solid #000000"
-						}
-					}*/
+				this.logoBox.div
+				,
 
-					this.logoBox.div
-					,
-					
+				{
+					tag : 'div.' + options.prefix + "-title",
+					style : {
+						width : options.width*0.66,
+						height : options.height*0.108,
+						left : options.width*0.17,
+						position : "absolute",
+						textAlign : "center",
+						outline : "none"
+					},
+					attr : {
+						contenteditable : true
+					},
+					events : {
+						keyup : function () {
+							this.fire('changeSlidesTitle',scp[options.prefix + "-title"].innerHTML);
+						}.bind(this)
+					},
+					innerHTML : options.title || null,
+				},
+				]
+			}, scp)
+
+			if(this.type === 'moods'){
+
+				this.menu = new Selectbox({
+					choices : [
+					{ label : 'MOODS', id : 'moods' },
+					{ label : 'STORIES', id : 'stories' }
+					],
+					change : function(choice) {
+						this.fire('layout:changed',choice.id)
+					}.bind(this),
+
+			def : 'moods' // l'identifiant de la valeur par défaut
+		})
+				this.menu.fake.className += " moods";
+				this.menu.trigger.className += " moods";
+				this.menu.up();
+				this.menu.opened = false
+				this.menu.trigger.onclick = function(e) {
+					e.preventDefault();
+					if(!this.menu.opened){
+						this.menu.down();
+						this.menu.opened = true;
+					}else{
+						this.menu.up();
+						this.menu.opened = false;
+					}
+				}.bind(this);
+
+				this.el.appendChild(this.menu.el)
+
+				var box = this.box.div;
+
+				this.bloc = toDOM({
+					tag : 'div.' + options.prefix +'-bloc',
+					style : {
+						width : box.style.width,
+						height : box.style.width,
+						position : "absolute"
+					},
+
+					children : [
+
+					box,
 					{
-						tag : 'div.' + options.prefix + "-title",
+						tag : 'div.' + options.prefix + "-desc",
+
 						style : {
-							width : options.width*0.66,
-							height : options.height*0.108,
-							left : options.width*0.17,
+							opacity : "0.7",
+							backgroundColor : "#000000",
+							width : 380,
+							height : 50,
 							position : "absolute",
-							textAlign : "center",
-							outline : "none"
+							zIndex : 1
 						},
+
 						attr : {
 							contenteditable : true
 						},
 						events : {
-							keyup : function () {
-								this.fire('changeSlidesTitle',scp[options.prefix + "-title"].innerHTML);
-								console.log(scp[options.prefix + "-title"].innerHTML);
+							keyup : function() {
+								this.texte = this.bloc.children[1].innerHTML;
+								this.fire("commentChanged",this.texte);
 							}.bind(this)
 						},
-						innerHTML : options.title || null,
-					},
-
-					{
-						tag : 'div.' + options.prefix + "-menu",
-						style : {
-							width : options.width*0.16,
-							height : options.height*0.108,
-							position : "absolute",
-							left : options.width*0.83
-						}
-					}	
+						innerHTML : options.comment||"",
+					}
 					]
-				}, scp)
+				})
 
-if(this.type === 'moods'){
-	var box = this.box.div;
+				this.bloc.style.top = (parseInt(options.height) - parseInt(this.box.div.style.height))/2;
+				this.bloc.style.left = (parseInt(options.width) - parseInt(this.box.div.style.width))/2;
 
-	this.bloc = toDOM({
-		tag : 'div.' + options.prefix +'-bloc',
-		style : {
-			width : box.style.width,
-			height : box.style.width,
-			position : "absolute"
-		},
+				this.box.on('update:position',function (x,y,iWidth,iHeight) {
+					this.bloc.children[1].style.left = Math.min(Math.max(x - 50,-50),parseInt(this.box.div.style.width));
+					this.bloc.children[1].style.top =  Math.max(Math.min(y + iHeight - 50,parseInt(this.box.div.style.height)-50), - 50);
+				}.bind(this));
 
-		children : [
-
-		box,
-		{
-			tag : 'div.' + options.prefix + "-desc",
-
-			style : {
-				opacity : "0.7",
-				backgroundColor : "#000000",
-				width : 380,
-				height : 50,
-				position : "absolute",
-				zIndex : 1
-			},
-
-			attr : {
-				contenteditable : true
-			},
-
-			event : {
-				keyup : function() {
-					this.texte = this.desc.innerHTML
-				}.bind(this)
+				this.el.children[1].style.color = "#f17f37";
+				this.el.appendChild(this.bloc)
 			}
-		}
-		]
-	})
+			else if (this.type === 'stories') {
 
-	this.bloc.style.top = (parseInt(options.height) - parseInt(this.box.div.style.height))/2;
-	this.bloc.style.left = (parseInt(options.width) - parseInt(this.box.div.style.width))/2;
+				this.menu = new Selectbox({
+					choices : [
+					{ label : 'STORIES', id : 'stories' },
+					{ label : 'MOODS', id : 'moods' },
+					],
+					change : function(choice) {
+						this.fire('layout:changed',choice.id);
+					}.bind(this),
 
-	this.box.on('update:position',function (x,y,iWidth,iHeight) {
-		this.bloc.children[1].style.left = Math.min(Math.max(x - 50,-50),parseInt(this.box.div.style.width));
-		this.bloc.children[1].style.top =  Math.max(Math.min(y + iHeight - 50,parseInt(this.box.div.style.height)-50), - 50);
-		console.log(this.bloc.children[1].style.left,this.bloc.children[1].style.top)
-		console.log(x,y,iWidth,iHeight);
-		//console.log(this.bloc.style.height);
-	}.bind(this));
+			def : 'stories' // l'identifiant de la valeur par défaut
+		})
 
-	this.el.children[1].style.color = "#f17f37";
-	this.el.appendChild(this.bloc)
-}
-else if (this.type === 'stories') {
-	this.box.div.style.left = this.box.div.style.top = 100;
-	this.el.children[1].style.color = "#8c8fc2";
-	var boxWidth = parseInt(this.box.div.style.width);
+				this.menu.fake.className += " stories";
+				this.menu.trigger.className += " stories";
+				this.menu.up();
+				this.el.appendChild(this.menu.el);
 
-	this.bulletPoint = toDOM({
-		tag : 'div.' + options.prefix + "-list",
-		style : {
-			position : "absolute",
-			width : 200,
-			height : 600,
-			top : 100,
-			left : 150 + boxWidth
-		}
-	})
+				this.menu.opened = false
+				this.menu.trigger.onclick = function(e) {
+					e.preventDefault();
+					if(!this.menu.opened){
+						this.menu.down();
+						this.menu.opened = true;
+					}else{
+						this.menu.up();
+						this.menu.opened = false;
+					}
+				}.bind(this);
 
-	var nbLines = 0;
-	var maxLines = 4;
-	var index = 0;
+				this.box.div.style.left = this.box.div.style.top = 100;
+				this.el.children[1].style.color = "#8c8fc2";
+				var boxWidth = parseInt(this.box.div.style.width);
 
-	function addLine (e){
-		if(e.keyCode === 13 && nbLines < maxLines){
-			nbLines++;
-			index++;
-			var scope = {};
-			var nextItem = toDOM({
-				tag : 'div.' + options.prefix + "-list-element",
-				style : {
-					width : 199,
-					height : 100,
-				},
-
-				children : [
-				{
-					tag : 'div.' + options.prefix + "-bulletPoint",
+				this.bulletPoint = toDOM({
+					tag : 'div.' + options.prefix + "-list",
 					style : {
+						position : "absolute",
+						width : 200,
+						height : 600,
+						top : 100,
+						left : 150 + boxWidth
+					}
+				})
+
+				var nbLines = 0;
+				var maxLines = 4;
+				var index = 0;
+
+				function addLine (e){
+					if(e.keyCode === 13 && nbLines < maxLines){
+						nbLines++;
+						index++;
+						var scope = {};
+						var nextItem = toDOM({
+							tag : 'div.' + options.prefix + "-list-element",
+							style : {
+								width : 199,
+								height : 100,
+							},
+
+							children : [
+							{
+								tag : 'div.' + options.prefix + "-bulletPoint",
+								style : {
 									//backgroundImage : ,
 									backgroundColor : "#8c8fc2",
 									width : 15,
@@ -203,14 +235,9 @@ else if (this.type === 'stories') {
 								},
 								events : {
 									keydown : function (e) {
-										//console.log('yo');
 										addLine(e)
-										//console.log('yo2');
-										//console.log(e.keyCode);
 										if(e.keyCode === 8 && nbLines > 1 && scope[options.prefix + '-text'].innerHTML === ""){
-											console.log('yo3')
 											e.preventDefault();
-											console.log('heyho')
 											nbLines--;
 											nextItem.parentNode.removeChild(nextItem);
 										}

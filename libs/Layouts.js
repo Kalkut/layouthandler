@@ -4,24 +4,24 @@ sand.define('Layouts',['Layout'], function (r) {
 
 		'+init' : function (options) {
 			this.options = options;
+			this.options.comments = {};
 			this.toLayout();
 			this.title;
-		//this.position = {};
-		//this.position[this.layout.type] = [];
 
 		this.on('changedLayout', function (type) {
 			this.title = this.layout.title
-			console.log(this.title)
 			this.toLayout(type);
-			if(type === "stories"){
+			if(type === "stories") {
 				this.layout.cases[3].txtBloc.children[0].children[0].children[0].innerHTML = this.title;
-			} else if (type === "moods"){
+			} else if (type === "moods") {
 				this.layout.cases[5].txtBloc.children[0].children[0].children[0].innerHTML = this.title;
+				for(var i = 1, n = this.layout.slides.length; i < n; i++) {
+					this.layout.slides[i].bloc.children[1].innerHTML = this.options.comments[i]||null;
+				}
 			}
 			this.layout.fire('changeTheTitleEverywhere',this.title||"");
 		}.bind(this))
 
-		
 		
 		this.layout.menu.onchange = function () {
 			this.fire('changedLayout',this.layout.menu.value);
@@ -35,41 +35,34 @@ sand.define('Layouts',['Layout'], function (r) {
 			daddy.removeChild(this.layout.elt);
 			this.layout = this.create(Layout,this.options);
 			daddy.appendChild(this.layout.elt);
-		}else{
+		}else {
 			this.layout = this.create(Layout,this.options);
 		}
 
-		this.layout.on('anImgMoved', function (x,y,z,i , k) {
-			//var indice = i.toString();
-			if(this.options[this.layout.type] || this.options[this.layout.type] === {}){
-				if(this.options[this.layout.type][k] || this.options[this.layout.type][k] === {}){
-				this.options[this.layout.type][k][i] = [x,y,z];
-			}else{
-				this.options[this.layout.type][k] = {};
+		for (var indice in this.options.comments) {
+			if(indice != 0 && this.options.type === "moods") {
+				this.layout.slides[indice].bloc.children[1].innerHTML = this.options.comments[indice]||null;
 			}
-			}else{
+		}
+		this.layout.on('changeLayout', function (type) {
+			this.fire('changedLayout',type)
+		}.bind(this));
+
+		this.layout.on('changeComment', function (i , comment) {
+			this.options.comments[i] = comment;
+		}.bind(this))
+
+		this.layout.on('anImgMoved', function (x , y , z , i , k) {
+			if(this.options[this.layout.type] || this.options[this.layout.type] === {}) {
+				if(this.options[this.layout.type][k] || this.options[this.layout.type][k] === {}) {
+					this.options[this.layout.type][k][i] = [x,y,z];
+				}else {
+					this.options[this.layout.type][k] = {};
+				}
+			}else {
 				this.options[this.layout.type] = {};
 			}
 		}.bind(this))
 	},
-
-	saveImgPositions : function () {
-			for(var i = 0, n = this.layout.cases.length ; i < n; i++){
-			this.position[this.layout.type].push([this.layout.cases[i].img.style.left , this.layout.cases[i].img.style.top])
-		}
-	},
-
-	loadImgPositions : function () {
-		if(this.position[this.layout.type] || this.position[this.layout.type] === []){
-			for(var i = 0, n = this.layout.cases.length; i < n; i++){			
-				this.layout.cases[i].img.style.left = this.position[this.layout.type][i][0]
-				this.layout.cases[i].img.style.top = this.position[this.layout.type][i][1]
-			}
-		}else{
-			this.position[this.layout.type] = [];
-		}
-	}
-
-
 })
 })

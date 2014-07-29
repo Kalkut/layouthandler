@@ -6,6 +6,20 @@ Function.prototype.curry = function () {
 	};
 }
 
+var onimagesload = function (imgs,callback) {
+	var l = imgs.length;
+	var c = 0;
+	for (var i = 0; i < l; i++){
+		if(imgs[i].loaded) c++;
+		else imgs[i].onload = function () {
+			c++;
+			if (c === l) callback();
+		}
+	}
+
+	if (c === l) callback();
+}	
+
 
 var positions = {
 	moods: [
@@ -34,32 +48,17 @@ var positions = {
 	],
 }
 
-sand.define('Layout',['Slide','Banner','Case'], function (r) {
+sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function (r) {
 	var Slide = r.Slide;
 	var Banner = r.Banner;
 	var Case = r.Case;
+	var Selectbox = r.Selectbox;
 
 	return Seed.extend({
 
 		'+options': {
 			imgSrcs: '',
 			selectionIndex: null,
-			menu: toDOM({
-				tag: 'select',
-				children: [{
-					tag: 'option',
-					attr: {
-						value: "moods",
-					},
-					innerHTML: "Moods"
-				}, {
-					tag: 'option',
-					attr: {
-						value: "stories"
-					},
-					innerHTML: "Stories"
-				}]
-			})
 		},
 
 		'+init': function (options) {
@@ -67,6 +66,43 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 			this.type = options.type;
 			this.positions = options.positions || null;
 			this.slides = [];
+
+			this.menu = new Selectbox({
+				choices : [
+				{ label : 'MOODS', id : 'moods' },
+				{ label : 'STORIES', id : 'stories' }
+				],
+				change : function(choice) {
+					this.fire('changeLayout',choice.id)
+				}.bind(this),
+
+			def : this.type // l'identifiant de la valeur par défaut
+		})
+
+			var icon = new Image();
+			icon.src = "/damier.png";
+
+			onimagesload([icon], function () {
+				this.menu.trigger.appendChild(icon)
+			}.bind(this));
+			this.menu["select-box"].style.left = 10;
+			this.menu["select-box"].style.zIndex = 1;
+			this.menu.fake.className += " " + this.type;
+			this.menu["trigger-picto"].parentNode.removeChild(this.menu["trigger-picto"]);
+			this.menu["trigger-label"].parentNode.removeChild(this.menu["trigger-label"]);
+
+			this.menu.up();
+			this.menu.opened = false
+			this.menu["select-box"].onclick = function(e) {
+				e.preventDefault();
+				if(!this.menu.opened) {
+					this.menu.down();
+					this.menu.opened = true;
+				} else {
+					this.menu.up();
+					this.menu.opened = false;
+				}
+			}.bind(this);
 
 			this.el = toDOM({
 				tag: "div." + options.prefix + "-layout",
@@ -96,12 +132,11 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 			}
 
 			this.el.appendChild(this.banner.div);
-			this.banner.band.appendChild(this.menu);
+			this.banner.band.appendChild(this.menu.el);
 			this.slides.push(this);
 
 
 			for (var i = 0, n = this.positions.length; i < n; i++) {
-				
 				if (this.type === 'moods') {
 					var tempCase = new Case({
 						width: this.positions[i][2],
@@ -117,6 +152,7 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 						prefix: "berenger",
 						width: 1100,
 						height: 750,
+						comment : options.comments[i]||"",
 						box: {
 							prefix: "berenger",
 							width: 650,
@@ -153,21 +189,30 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 				}
 
 				tempSlide.hide();
-				
-				for(var k = 0, l = tempSlide.cases.length; k < l; k++){
+
+				tempSlide.on('layout:changed', function (type) {
+					this.fire('changeLayout',type);
+				}.bind(this))
+
+
+				for(var k = 0, l = tempSlide.cases.length; k < l; k++) {
 					tempSlide.cases[k].on('imgMoved', function (k , i, x, y, z) {
 						this.fire('anImgMoved', x, y, z, k, i);
 					}.bind(this).curry(k,i+1))
 				}
-				
+
+				tempSlide.on('commentChanged', function (i,comment) {
+					this.fire('changeComment',i,comment);
+				}.bind(this).curry(i+1))
+
 				tempSlide.on('changeSlidesTitle', function (title) {
 					this.fire('changeTheTitleEverywhere', title);
 				}.bind(this))
-				
-				if (tempCase.type = 'img'){
+
+				if (tempCase.type = 'img') {
 					this.slides.push(tempSlide);
 				} 
-				
+
 				this.cases.push(tempCase);
 
 				this.cases[i].selected = false;
@@ -181,7 +226,6 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 				}.bind(this).curry(i))
 				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
 					tempCase.on('titleChanged', function (title) {
-						console.log(title)
 						this.fire('changeTheTitleEverywhere', title);
 					}.bind(this))
 				}
@@ -215,9 +259,8 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 			}.bind(this))
 
 			if (options[this.type]) {
-				for(var indiceSlides in options[this.type]){
+				for(var indiceSlides in options[this.type]) {
 					for (var indice in options[this.type][indiceSlides]) {
-						console.log(parseInt(indice));
 						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options[this.type][indiceSlides][indice][0];
 						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options[this.type][indiceSlides][indice][1]
 					}
@@ -237,7 +280,7 @@ sand.define('Layout',['Slide','Banner','Case'], function (r) {
 
 			this.elt = document.createElement('div');
 			this.elt.appendChild(this.el)
-			for(var i = 1, n = this.slides.length; i < n; i++){
+			for(var i = 1, n = this.slides.length; i < n; i++) {
 				this.elt.appendChild(this.slides[i].el);
 			}
 

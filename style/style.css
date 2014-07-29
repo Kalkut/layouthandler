@@ -56,3 +56,31 @@ table.berenger-case{
 	padding: 9px;
 	text-align: center;
 }
+
+.trigger-label,.item,.select-box{
+	font-family : "cbi";
+	font-size : 35;
+	color: #FFFFFF;
+	width : 200;
+	height : 60;
+}
+
+.select-box{
+	position : absolute;
+	left: 900;
+}
+
+.item,.trigger-label,.fake{
+	text-align: center;
+	vertical-align: middle;
+	z-index: 1;
+}
+
+
+.stories{
+	background-color: #8c8fc2;
+}
+
+.moods{
+	background-color: #f17f37;
+}
