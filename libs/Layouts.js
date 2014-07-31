@@ -78,7 +78,9 @@ sand.define('Layouts',['Layout'], function (r) {
 		this.layout.on("lineRemoved", function (index, signature) {
 			var deleteIndex = this.data.signatures[index].indexOf(signature);
 			if (deleteIndex > -1){
-				this.data.signatures[index][deleteIndex] = "";
+				this.data.signatures[index].splice(deleteIndex,1);
+				this.data.signatures[index].push("");
+				delete this.data.bulletPoints[index][signature];
 			}
 		}.bind(this))
 		

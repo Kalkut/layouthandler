@@ -261,7 +261,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 											e.preventDefault();
 											this.nbLines--;
 											console.log(this.nbLines);
-											this.nextItem.parentNode.removeChild(this.nextItem);
+											scope[this.prefix + "-list-element"].parentNode.removeChild(scope[this.prefix + "-list-element"]);
 											this.fire("lineDestroyed", scope[this.prefix + '-text'].attributes.signature.value,this.nbLines)
 										}
 									}.bind(this),
