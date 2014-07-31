@@ -97,17 +97,17 @@ sand.define('Layouts',['Layout'], function (r) {
 			this.fire("newTitle",title);
 		}.bind(this))
 
-		this.layout.on('anImgMoved', function (x , y , z , i , k) {
+		this.layout.on('anImgMoved', function (x , y , width, height , i , k) {
 			if(this.data.positions[this.layout.type] || this.data.positions[this.layout.type] === {}) {
 				if(this.data.positions[this.layout.type][k] || this.data.positions[this.layout.type][k] === {}) {
-					this.data.positions[this.layout.type][k][i] = [x,y,z];
+					this.data.positions[this.layout.type][k][i] = [x,y, width, height];
 				}else {
 					this.data.positions[this.layout.type][k] = {};
 				}
 			}else {
 				this.data.positions[this.layout.type] = {};
 			}
-			this.fire('image:moved',[x,y,z],k,i);
+			this.fire('image:moved',[x,y,width,height],k,i);
 		}.bind(this))
 	},
 })

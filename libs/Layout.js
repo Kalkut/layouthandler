@@ -198,8 +198,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 
 				for(var k = 0, l = tempSlide.cases.length; k < l; k++) {
-					tempSlide.cases[k].on('imgMoved', function (k , i, x, y, z) {
-						this.fire('anImgMoved', x, y, z, k, i);
+					tempSlide.cases[k].on('imgMoved', function (k , i, x, y, width, height) {
+						this.fire('anImgMoved', x, y, width, height, k, i);
 					}.bind(this).curry(k,i+1))
 				}
 
@@ -237,8 +237,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.cases[i].div.addEventListener("mousedown", function (i) {
 					this.fire('selection', i);
 				}.bind(this).curry(i))
-				this.cases[i].on('imgMoved', function (i, x, y, z) {
-					this.fire('anImgMoved', x, y, z, i, 0);
+				this.cases[i].on('imgMoved', function (i, x, y, width, height) {
+					this.fire('anImgMoved', x, y, width,height, i, 0);
 				}.bind(this).curry(i))
 				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
 					tempCase.on('titleChanged', function (title) {
@@ -279,7 +279,9 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				for(var indiceSlides in options.positions[this.type]) {
 					for (var indice in options.positions[this.type][indiceSlides]) {
 						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options.positions[this.type][indiceSlides][indice][0];
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options.positions[this.type][indiceSlides][indice][1]
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options.positions[this.type][indiceSlides][indice][1];
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width = options.positions[this.type][indiceSlides][indice][2];
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = options.positions[this.type][indiceSlides][indice][3];
 					}
 				}
 			}
