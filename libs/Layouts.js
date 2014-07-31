@@ -7,7 +7,7 @@ sand.define('Layouts',['Layout'], function (r) {
 			this.data.comments = this.data.comments || {};
 			this.data.positions = this.data.positions || {};
 			this.data.bulletPoints = this.data.bulletPoints || {};
-			this.data.signatures = this.data.signatures || {1: [], 2:[], 3:[], 4:[], 5:[]};
+			this.data.signatures = this.data.signatures || {1: ["","","",""], 2:["","","",""], 3:["","","",""], 4:["","","",""], 5:["","","",""]};
 
 			this.toLayout();
 			this.title;
@@ -52,24 +52,33 @@ sand.define('Layouts',['Layout'], function (r) {
 		this.layout.on("bp:updated", function (index,signature,bptext) {
 			this.fire("BulletPoint", index,signature,bptext);
 			if(this.data.bulletPoints[index] || this.data.bulletPoints[index] === {}){
-				if(this.data.bulletPoints[index][signature] || this.data.bulletPoints[index][signature] === {}) {
+				if(this.data.bulletPoints[index][signature] || this.data.bulletPoints[index][signature] === "") {
 					this.data.bulletPoints[index][signature] = bptext
 				} else {
-					this.data.bulletPoints[index][signature] = {};
+					this.data.bulletPoints[index][signature] = "";
 				}
 			} else {
 				this.data.bulletPoints[index] = {};
 			}
 		}.bind(this))
 
-		this.layout.on("lineAdded", function (index, signature) {
-			this.data.signatures[index].push(signature);
+		this.layout.on("lineAdded", function (index, signature,nbLignes) {
+			this.data.signatures[index][nbLignes-1] = signature;
 		}.bind(this))
+
+		if(this.layout.type === "stories") {
+			for(var i = 1, n = this.layout.slides.length - 1; i < n; i++){
+				this.layout.slides[i].addLine({keyCode : 13})
+				for(var k = 1, m = this.data.signatures[i].length; k < m; k++){
+					if(this.data.signatures[i][k]) this.layout.slides[i].addLine({keyCode : 13});
+				}
+			}
+		}
 
 		this.layout.on("lineRemoved", function (index, signature) {
 			var deleteIndex = this.data.signatures[index].indexOf(signature);
 			if (deleteIndex > -1){
-				this.data.signatures[index].splice(deleteIndex,1);
+				this.data.signatures[index][deleteIndex] = "";
 			}
 		}.bind(this))
 		

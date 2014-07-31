@@ -202,13 +202,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.nbLines = 0;
 				this.maxLines = 4;
 				this.index = 0;
-				if (this.nbLines) {
-					for(var i = 1; i <= this.nbLines; i++){
-						this.addLine({keyCode : 13});
-					} 
-				} else {
-					this.addLine({keyCode : 13});
-				}
+				//this.addLine({keyCode : 13});
+				//this.fire('newLine',this.nextItem.children[1].attributes.signature.value,this.nbLines); //TRES DEGUEULASSE : Le 1er fire refuse de se trigger
 
 
 
@@ -227,9 +222,9 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 		addLine : function (e){
 			if(e.keyCode === 13 && this.nbLines < this.maxLines){
 				this.nbLines++;
-				this.index++;
+				this.index = Date.now();
 				var scope = {};
-				var nextItem = toDOM({
+				this.nextItem = toDOM({
 					tag : 'div.' + this.prefix + "-list-element",
 					style : {
 						width : 199,
@@ -257,7 +252,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 								},
 								attr : {
 									contenteditable : true,
-									signature : this.signatures[this.maxLines-this.nbLines] || this.index,
+									signature : this.signatures[this.nbLines-1] || this.index,
 								},
 								events : {
 									keydown : function (e) {
@@ -266,8 +261,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 											e.preventDefault();
 											this.nbLines--;
 											console.log(this.nbLines);
-											nextItem.parentNode.removeChild(nextItem);
-											this.fire("lineDestroyed", scope[this.prefix + '-text'].attributes.signature.value)
+											this.nextItem.parentNode.removeChild(this.nextItem);
+											this.fire("lineDestroyed", scope[this.prefix + '-text'].attributes.signature.value,this.nbLines)
 										}
 									}.bind(this),
 
@@ -282,10 +277,11 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 							]
 						}, scope);
 
-nextItem.children[1].innerHTML = this.bulletPoints[nextItem.children[1].attributes.signature.value] || "";
-this.bulletPoint.appendChild(nextItem);
-nextItem.focus();
-this.fire('newLine',nextItem.children[1].attributes.signature.value);
+this.nextItem.children[1].innerHTML = this.bulletPoints[this.nextItem.children[1].attributes.signature.value] || "";
+this.bulletPoint.appendChild(this.nextItem);
+this.nextItem.focus();
+this.fire('newLine',this.nextItem.children[1].attributes.signature.value,this.nbLines);
+console.log(this.nbLines)
 }
 }
 

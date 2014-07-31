@@ -207,9 +207,10 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					this.fire("bp:updated", index,signature,bptext);
 				}.bind(this).curry(i+1))
 
-				tempSlide.on('newLine' , function (index,signature) {
-					this.fire('lineAdded', index, signature)
+				tempSlide.on('newLine' , function (index, signature , nbLines) {
+					this.fire('lineAdded', index, signature, nbLines)
 				}.bind(this).curry(i+1));
+				//tempSlide.addLine({keyCode : 13});
 
 				tempSlide.on("lineDestroyed" , function (index,signature) {
 					this.fire('lineRemoved', index, signature)
