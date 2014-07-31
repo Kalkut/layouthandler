@@ -177,6 +177,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						prefix: "berenger",
 						width: 1100,
 						height: 750,
+						bulletPoints : options.bulletPoints[i+1] || {},
+						signatures : options.signatures[i+1],
 						box: {
 							prefix: "berenger",
 							width: 700,
@@ -201,12 +203,25 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					}.bind(this).curry(k,i+1))
 				}
 
+				tempSlide.on("bp:update", function (index,signature,bptext) {
+					this.fire("bp:updated", index,signature,bptext);
+				}.bind(this).curry(i+1))
+
+				tempSlide.on('newLine' , function (index,signature) {
+					this.fire('lineAdded', index, signature)
+				}.bind(this).curry(i+1));
+
+				tempSlide.on("lineDestroyed" , function (index,signature) {
+					this.fire('lineRemoved', index, signature)
+				}.bind(this).curry(i+1));
+
 				tempSlide.on('commentChanged', function (i,comment) {
 					this.fire('changeComment',i,comment);
 				}.bind(this).curry(i+1))
 
 				tempSlide.on('changeSlidesTitle', function (title) {
 					this.fire('changeTheTitleEverywhere', title);
+					this.fire('getTitle', title);
 				}.bind(this))
 
 				if (tempCase.type = 'img') {
@@ -227,6 +242,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
 					tempCase.on('titleChanged', function (title) {
 						this.fire('changeTheTitleEverywhere', title);
+						this.fire('getTitle',title);
 					}.bind(this))
 				}
 				this.el.appendChild(this.cases[i].div);
@@ -258,11 +274,11 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.title = title;
 			}.bind(this))
 
-			if (options[this.type]) {
-				for(var indiceSlides in options[this.type]) {
-					for (var indice in options[this.type][indiceSlides]) {
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options[this.type][indiceSlides][indice][0];
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options[this.type][indiceSlides][indice][1]
+			if (options.positions[this.type]) {
+				for(var indiceSlides in options.positions[this.type]) {
+					for (var indice in options.positions[this.type][indiceSlides]) {
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options.positions[this.type][indiceSlides][indice][0];
+						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options.positions[this.type][indiceSlides][indice][1]
 					}
 				}
 			}

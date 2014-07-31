@@ -12,9 +12,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			}.bind(this))
 
 			this.type = options.type;
-			var that = this;
 			var scp = {};
-			this.texte;
+			this.prefix = options.prefix;
+			this.bulletPoints = options.bulletPoints;
+			this.signatures = options.signatures || {};
 
 
 			this.logoBox =  new Case({ width : options.width*0.17 , height : options.height*0.108 , prefix : "berenger", imgSrc : options.logo, type : "img", fit : true})
@@ -198,26 +199,47 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					}
 				})
 
-				var nbLines = 0;
-				var maxLines = 4;
-				var index = 0;
+				this.nbLines = 0;
+				this.maxLines = 4;
+				this.index = 0;
+				if (this.nbLines) {
+					for(var i = 1; i <= this.nbLines; i++){
+						this.addLine({keyCode : 13});
+					} 
+				} else {
+					this.addLine({keyCode : 13});
+				}
 
-				function addLine (e){
-					if(e.keyCode === 13 && nbLines < maxLines){
-						nbLines++;
-						index++;
-						var scope = {};
-						var nextItem = toDOM({
-							tag : 'div.' + options.prefix + "-list-element",
-							style : {
-								width : 199,
-								height : 100,
-							},
 
-							children : [
-							{
-								tag : 'div.' + options.prefix + "-bulletPoint",
-								style : {
+
+
+				this.el.appendChild(this.box.div);
+				this.el.appendChild(this.bulletPoint);
+			}
+
+
+
+
+
+
+		},
+
+		addLine : function (e){
+			if(e.keyCode === 13 && this.nbLines < this.maxLines){
+				this.nbLines++;
+				this.index++;
+				var scope = {};
+				var nextItem = toDOM({
+					tag : 'div.' + this.prefix + "-list-element",
+					style : {
+						width : 199,
+						height : 100,
+					},
+
+					children : [
+					{
+						tag : 'div.' + this.prefix + "-bulletPoint",
+						style : {
 									//backgroundImage : ,
 									backgroundColor : "#8c8fc2",
 									width : 15,
@@ -227,54 +249,45 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 							},
 							
 							{
-								tag : 'div.' + options.prefix + "-text",
+								tag : 'div.' + this.prefix + "-text",
 								style :{
 									width : 180,
 									height : 100,
 									cssFloat : "left",
 								},
+								attr : {
+									contenteditable : true,
+									signature : this.signatures[this.maxLines-this.nbLines] || this.index,
+								},
 								events : {
 									keydown : function (e) {
-										addLine(e)
-										if(e.keyCode === 8 && nbLines > 1 && scope[options.prefix + '-text'].innerHTML === ""){
+										this.addLine(e);
+										if(e.keyCode === 8 && this.nbLines > 1 && scope[this.prefix + '-text'].innerHTML === ""){
 											e.preventDefault();
-											nbLines--;
+											this.nbLines--;
+											console.log(this.nbLines);
 											nextItem.parentNode.removeChild(nextItem);
+											this.fire("lineDestroyed", scope[this.prefix + '-text'].attributes.signature.value)
 										}
-									},
+									}.bind(this),
 
 									keyup : function(e) {
 										e.preventDefault();
-										this.texte
-									}
+										this.fire("bp:update", scope[this.prefix + '-text'].attributes.signature.value, scope[this.prefix + '-text'].innerHTML)
+										//console.log(scope[this.prefix + '-text'].attributes.signature.value, scope[this.prefix + '-text'].innerHTML);
+									}.bind(this)
 								},
-								attr : {
-									contenteditable : true,
-									index : index,
-								}
+
 							}
 							]
-						}, scope)
-that.bulletPoint.appendChild(nextItem);
-nextItem.focus();	
+						}, scope);
+
+nextItem.children[1].innerHTML = this.bulletPoints[nextItem.children[1].attributes.signature.value] || "";
+this.bulletPoint.appendChild(nextItem);
+nextItem.focus();
+this.fire('newLine',nextItem.children[1].attributes.signature.value);
 }
 }
-
-
-
-this.el.appendChild(this.box.div);
-this.el.appendChild(this.bulletPoint);
-addLine({keyCode : 13});
-}
-
-
-
-
-
-
-},
-
-
 
 })
 
