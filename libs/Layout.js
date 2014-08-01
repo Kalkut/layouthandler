@@ -142,13 +142,13 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				if (this.type === 'moods') {
 					var imgIndex;
 					i < 5 ? imgIndex = i : imgIndex = i-1;
-
 					var tempCase = new Case({
 						width: this.positions[i][2],
 						height: this.positions[i][3],
 						type: i === 5 ? 'txt' : 'img',
 						imgSrc: options.imgSrcs[imgIndex],
-						prefix: options.prefix
+						prefix: options.prefix,
+						pos : (options.positions && options.positions.moods && options.positions.moods[0]) ? options.positions.moods[0][i] : null
 					})
 					var tempSlide = new Slide({
 						logo: options.logo,
@@ -164,7 +164,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							height: 591,
 							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
-							fit : true
+							fit : true,
+							pos : (options.positions && options.positions.moods && options.positions.moods[i]) ? options.positions.moods[i][0] : null
 						}
 					})
 				} else if (this.type === 'stories') {
@@ -174,7 +175,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						height: this.positions[i][3],
 						type: i === 3 ? 'txt' : 'img',
 						imgSrc: options.imgSrcs[imgIndex],
-						prefix: options.prefix
+						prefix: options.prefix,
+						pos : (options.positions && options.positions.stories && options.positions.stories[0]) ? options.positions.stories[0][i] : null
 					})
 					var tempSlide = new Slide({
 						logo: options.logo,
@@ -192,6 +194,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
+							pos : (options.positions && options.positions.stories && options.positions.stories[i]) ? options.positions.stories[i][0] : null
 						}
 					})
 				}

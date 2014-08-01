@@ -31,19 +31,18 @@ sand.define('Layouts',['Layout'], function (r) {
 				this.fire('changedLayout',this.layout.menu.value);
 			}.bind(this);
 
-			this.on('newLayout', function () {	
+			/*this.on('newLayout', function () {	
 				if (this.data.positions[this.layout.type]) {
 					for(var indiceSlides in this.data.positions[this.layout.type]) {
 						for (var indice in this.data.positions[this.layout.type][indiceSlides]) {
-							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width = parseInt(this.data.positions[this.layout.type][indiceSlides][indice][2]);
-							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = parseInt(this.data.positions[this.layout.type][indiceSlides][indice][3]);
+							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width = this.data.positions[this.layout.type][indiceSlides][indice][2];
+							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = this.data.positions[this.layout.type][indiceSlides][indice][3];
 							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = this.data.positions[this.layout.type][indiceSlides][indice][0];
 							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = this.data.positions[this.layout.type][indiceSlides][indice][1];
-							console.log(indiceSlides,indice);
 						}
 					}
 				}
-			}.bind(this))
+			}.bind(this))*/
 
 },
 

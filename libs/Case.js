@@ -28,6 +28,7 @@ sand.define('Case', function (r) {
 			this.img.style.top = 0;
 			this.type = options.type;
 			this.fit = options.fit
+			this.pos = options.pos;
 			
 			this.div = toDOM({
 				tag : 'div.' + options.prefix + "-case-idle",
@@ -98,10 +99,17 @@ sand.define('Case', function (r) {
 							this.zoom(length);
 						} else if(e.keyCode === 109) {
 							length-=5;
-							if((length > parseInt(this.div.style.width) && length*this.img.ratio > parseInt(this.div.style.height)) || this.fit) this.zoom(length);
+							if((length > parseInt(this.div.style.width) && length*this.ratio > parseInt(this.div.style.height)) || this.fit) {
+								this.zoom(length);
+								console.log("right all along");
+							}
 						}
 					}
 				}.bind(this));
+
+				this.img.onclick = function (e) {
+					console.log(e.clientX - this.offsetLeft, e.clientY - this.offsetTop);
+				}
 				
 				var imgMove = function (e) {
 					var deltaX = e.clientX - this.img.width/2 - this.posClick[0];
@@ -122,41 +130,47 @@ sand.define('Case', function (r) {
 					
 				}.bind(this)
 
-				onimagesload([this.img],imgMove.bind(this))
 				onimagesload([this.img], function() {
-
+					//console.log(this.pos);
+					if(this.pos){
+						this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
+						this.img.style.width = this.pos[2];
+						this.img.style.height = this.pos[3];
+						this.img.style.left = this.pos[0];
+						this.img.style.top = this.pos[1];
+					} else {
 					this.img.style.height = this.img.naturalHeight;
 					this.img.style.width = this.img.naturalWidth;
-					this.img.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
+					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
 					
 					var height = parseInt(this.div.style.height);
 					var width = parseInt(this.div.style.width);
 					var ratioDiv = height/width;
 					
-					if (this.img.ratio > ratioDiv) this.zoom(width,false,true);
+					if (this.ratio > ratioDiv) this.zoom(width,false,true);
 					else this.zoom(height,true,true);
-
+				}
 
 				}.bind(this))
 				
 				this.div.onmousemove = imgMove.bind(this);
-				
 			}	
 		},
 
 		zoom : function (newLength,widthOrHeight,init) {
 			if(!widthOrHeight) {
 				this.img.style.width = newLength;
-				this.img.style.height = Math.floor(newLength*this.img.ratio);
+				this.img.style.height = newLength*this.ratio;
 			}
 			else {
 				this.img.style.height = newLength;
-				this.img.style.width = Math.floor(newLength/this.img.ratio);
+				this.img.style.width = newLength/this.ratio;
 			}
 			if(!init){
 			this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 			this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 			}
+			//console.log(this.img.style.height);
 		}
 
 
