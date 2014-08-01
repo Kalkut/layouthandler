@@ -291,7 +291,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.title = title;
 			}.bind(this))
 
-			if (options.positions[this.type]) {
+			/*if (options.positions[this.type]) {
 				for(var indiceSlides in options.positions[this.type]) {
 					for (var indice in options.positions[this.type][indiceSlides]) {
 						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options.positions[this.type][indiceSlides][indice][0];
@@ -300,7 +300,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = options.positions[this.type][indiceSlides][indice][3];
 					}
 				}
-			}
+			}*/
 
 			this.on('selection', function (i) {
 				if (this.selectionIndex || this.selectionIndex === 0) {

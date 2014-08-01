@@ -133,8 +133,9 @@ sand.define('Case', function (r) {
 					var width = parseInt(this.div.style.width);
 					var ratioDiv = height/width;
 					
-					if (this.img.ratio > ratioDiv) this.zoom(width,false);
-					else this.zoom(height,true);
+					if (this.img.ratio > ratioDiv) this.zoom(width,false,true);
+					else this.zoom(height,true,true);
+
 
 				}.bind(this))
 				
@@ -143,7 +144,7 @@ sand.define('Case', function (r) {
 			}	
 		},
 
-		zoom : function (newLength,widthOrHeight) {
+		zoom : function (newLength,widthOrHeight,init) {
 			if(!widthOrHeight) {
 				this.img.style.width = newLength;
 				this.img.style.height = Math.floor(newLength*this.img.ratio);
@@ -152,8 +153,10 @@ sand.define('Case', function (r) {
 				this.img.style.height = newLength;
 				this.img.style.width = Math.floor(newLength/this.img.ratio);
 			}
+			if(!init){
 			this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 			this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
+			}
 		}
 
 
