@@ -18,12 +18,14 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			this.signatures = options.signatures || {};
 
 
-			this.logoBox =  new Case({ width : options.width*0.17 , height : options.height*0.108 , prefix : "berenger", imgSrc : options.logo, type : "img", fit : true})
-			this.logoBox.div.style.cssFloat = "left";
+			this.logoBox =  new Case({ width : 87 , height : 47 , prefix : "berenger", imgSrc : options.logo, type : "img", fit : true})
 			this.logoBox.div.id = "logo";
+			this.logoBox.div.style.left = 70;
+			this.logoBox.div.style.top = 8;
 			this.logoBox.div.addEventListener("mousedown", function () {
 				this.fire('selection', "logo");
 			}.bind(this))
+
 
 			this.cases = [this.box,this.logoBox];
 
@@ -53,9 +55,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				{
 					tag : 'div.' + options.prefix + "-title",
 					style : {
-						width : options.width*0.66,
-						height : options.height*0.108,
-						left : options.width*0.17,
+						width : 620,
+						height : 30,
+						left : 190	,
+						top : 21,
 						position : "absolute",
 						textAlign : "center",
 						outline : "none"
@@ -142,8 +145,13 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					]
 				})
 
-				this.bloc.style.top = (parseInt(options.height) - parseInt(this.box.div.style.height))/2;
-				this.bloc.style.left = (parseInt(options.width) - parseInt(this.box.div.style.width))/2;
+				this.bloc.style.top = 87;
+				this.bloc.style.left = 160;
+				this.menu.el.style.top = 18;
+				this.menu.el.style.left = 960;
+				this.el.children[1].style.left = 240;
+
+
 
 				this.box.on('update:position',function (x,y,iWidth,iHeight) {
 					this.bloc.children[1].style.left = Math.min(Math.max(x - 50,-50),parseInt(this.box.div.style.width));
@@ -170,6 +178,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.menu.fake.className += " stories";
 				this.menu.trigger.className += " stories";
 				this.menu.up();
+				this.menu.el.style.top = 10;
+				this.menu.el.style.left = 881
 				this.el.appendChild(this.menu.el);
 
 				this.menu.opened = false
@@ -184,7 +194,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					}
 				}.bind(this);
 
-				this.box.div.style.left = this.box.div.style.top = 100;
+				this.box.div.style.left  = 63;
+				this.box.div.style.top = 110;
 				this.el.children[1].style.color = "#8c8fc2";
 				var boxWidth = parseInt(this.box.div.style.width);
 
@@ -192,10 +203,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					tag : 'div.' + options.prefix + "-list",
 					style : {
 						position : "absolute",
-						width : 200,
+						width : 321,
 						height : 600,
-						top : 100,
-						left : 150 + boxWidth
+						top : 130,
+						left : 743,
 					}
 				})
 
@@ -227,7 +238,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.nextItem = toDOM({
 					tag : 'div.' + this.prefix + "-list-element",
 					style : {
-						width : 199,
+						width : 250,
 						height : 100,
 					},
 
@@ -246,7 +257,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 							{
 								tag : 'div.' + this.prefix + "-text",
 								style :{
-									width : 180,
+									width : 210,
 									height : 100,
 									cssFloat : "left",
 								},
@@ -281,7 +292,6 @@ this.nextItem.children[1].innerHTML = this.bulletPoints[this.nextItem.children[1
 this.bulletPoint.appendChild(this.nextItem);
 this.nextItem.focus();
 this.fire('newLine',this.nextItem.children[1].attributes.signature.value,this.nbLines);
-console.log(this.nbLines)
 }
 }
 

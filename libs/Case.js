@@ -152,6 +152,7 @@ sand.define('Case', function (r) {
 				this.img.style.height = newLength;
 				this.img.style.width = Math.floor(newLength/this.img.ratio);
 			}
+			this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 			this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 		}
 

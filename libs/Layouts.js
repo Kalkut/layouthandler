@@ -7,10 +7,22 @@ sand.define('Layouts',['Layout'], function (r) {
 			this.data.comments = this.data.comments || {};
 			this.data.positions = this.data.positions || {};
 			this.data.bulletPoints = this.data.bulletPoints || {};
-			this.data.signatures = this.data.signatures || {1: ["","","",""], 2:["","","",""], 3:["","","",""], 4:["","","",""], 5:["","","",""]};
+			this.data.signatures = this.data.signatures || {1: ["","","",""], 2:["","","",""], 4:["","","",""], 5:["","","",""], 6:["","","",""]};
 
 			this.toLayout();
 			this.title;
+
+			if (this.data.positions[this.layout.type]) {
+				for(var indiceSlides in this.data.positions[this.layout.type]) {
+					for (var indice in this.data.positions[this.type][indiceSlides]) {
+						this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = this.data.positions[this.layout.type][indiceSlides][indice][0];
+						this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = this.data.positions[this.layout.type][indiceSlides][indice][1];
+						this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width = this.data.positions[this.layout.type][indiceSlides][indice][2];
+						this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = this.data.positions[this.layout.type][indiceSlides][indice][3];
+						console.log('je devrais être ta dernière instruction',this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width)
+					}
+				}
+			}
 
 			this.on('changedLayout', function (type) {
 				this.title = this.layout.title
@@ -67,48 +79,53 @@ sand.define('Layouts',['Layout'], function (r) {
 		}.bind(this))
 
 		if(this.layout.type === "stories") {
-			for(var i = 1, n = this.layout.slides.length - 1; i < n; i++){
+			for(var i = 1, n = this.layout.slides.length; i < n; i++){
+				var ind = i >= 3 ? i+1 : i;
 				this.layout.slides[i].addLine({keyCode : 13})
-				for(var k = 1, m = this.data.signatures[i].length; k < m; k++){
-					if(this.data.signatures[i][k]) this.layout.slides[i].addLine({keyCode : 13});
-				}
-			}
+					for(var k = 1, m = this.data.signatures[ind].length; k < m; k++){
+						if(this.data.signatures[ind][k]) this.layout.slides[i].addLine({keyCode : 13});
+					}
 		}
+	}
 
-		this.layout.on("lineRemoved", function (index, signature) {
-			var deleteIndex = this.data.signatures[index].indexOf(signature);
-			if (deleteIndex > -1){
-				this.data.signatures[index].splice(deleteIndex,1);
-				this.data.signatures[index].push("");
-				delete this.data.bulletPoints[index][signature];
-			}
-		}.bind(this))
-		
-		this.layout.on('changeLayout', function (type) {
-			this.fire('changedLayout',type)
-		}.bind(this));
+	this.layout.on("lineRemoved", function (index, signature) {
+		var deleteIndex = this.data.signatures[index].indexOf(signature);
+		if (deleteIndex > -1){
+			this.data.signatures[index].splice(deleteIndex,1);
+			this.data.signatures[index].push("");
+			delete this.data.bulletPoints[index][signature];
+		}
+	}.bind(this))
 
-		this.layout.on('changeComment', function (i , comment) {
-			this.data.comments[i] = comment;
-			this.fire('comment:change', i , comment);
-		}.bind(this))
+	this.layout.on('changeLayout', function (type) {
+		this.fire('changedLayout',type)
+	}.bind(this));
 
-		this.layout.on('getTitle', function () {
-			this.fire("newTitle",title);
-		}.bind(this))
+	this.layout.on('changeComment', function (i , comment) {
+		var ind = i >= 5 ? i-1 : i;
+		this.data.comments[ind] = comment;
+		this.fire('comment:change', ind , comment);
+	}.bind(this))
 
-		this.layout.on('anImgMoved', function (x , y , width, height , i , k) {
-			if(this.data.positions[this.layout.type] || this.data.positions[this.layout.type] === {}) {
-				if(this.data.positions[this.layout.type][k] || this.data.positions[this.layout.type][k] === {}) {
-					this.data.positions[this.layout.type][k][i] = [x,y, width, height];
-				}else {
-					this.data.positions[this.layout.type][k] = {};
-				}
+	this.layout.on('getTitle', function (title) {
+		this.fire("newTitle",title);
+	}.bind(this))
+
+	this.layout.on('anImgMoved', function (x , y , width, height , i , k) {
+		if(this.layout.type === "moods") var key = k >= 5 ? k-1 : k;
+		else if(this.layout.type === "stories") var key = k >= 3 ? k-1 : k;
+
+		if(this.data.positions[this.layout.type] || this.data.positions[this.layout.type] === {}) {
+			if(this.data.positions[this.layout.type][key] || this.data.positions[this.layout.type][key] === {}) {
+				this.data.positions[this.layout.type][key][i] = [x,y, width, height];
 			}else {
-				this.data.positions[this.layout.type] = {};
+				this.data.positions[this.layout.type][key] = {};
 			}
-			this.fire('image:moved',[x,y,width,height],k,i);
-		}.bind(this))
-	},
+		}else {
+			this.data.positions[this.layout.type] = {};
+		}
+		this.fire('image:moved',[x,y,width,height],key,i);
+	}.bind(this))
+},
 })
 })

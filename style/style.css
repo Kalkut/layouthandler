@@ -42,14 +42,14 @@ table.berenger-case{
 
 .berenger-title{
 	font-size: 30px;
+	text-align: center;
+	vertical-align: middle;
 }
 
 .berenger-desc{
 	font-size: 18px;
 	color: #FFFFFF;
 	padding: 15px 25px 15px 15px;
-	/*bottom: 50px;
-	left: -30px;*/
 }
 
 .berenger-banner-txt{
@@ -57,12 +57,15 @@ table.berenger-case{
 	text-align: center;
 }
 
-.trigger-label,.item,.select-box{
+.trigger-label,.item,.select-box,.fake{
 	font-family : "cbi";
-	font-size : 35;
+	font-size : 16;
 	color: #FFFFFF;
-	width : 200;
-	height : 60;
+	width : 115;
+	height : 40;
+	text-align: center;
+	vertical-align: middle;
+	z-index: 1;
 }
 
 .select-box{
@@ -70,17 +73,14 @@ table.berenger-case{
 	left: 900;
 }
 
-.item,.trigger-label,.fake{
-	text-align: center;
-	vertical-align: middle;
-	z-index: 1;
-}
-
-
 .stories{
 	background-color: #8c8fc2;
 }
 
 .moods{
 	background-color: #f17f37;
+}
+
+.berenger-bulletpoint{
+	margin-right: 22;
 }

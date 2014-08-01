@@ -19,9 +19,10 @@ sand.define('Banner',['Case'], function (r) {
 				this.txt.className = options.prefix + '-banner-txt'
 				this.txt.style.color = "#FFFFFF";
 				this.txt.style.fontFamily = "cbi";
-				this.txt.style.fontSize = 60;
+				this.txt.style.fontSize = 50;
 				this.txt.innerHTML = "M</br>O</br>O</br>D</br>S";
-				this.txt.style.top = 250;
+				this.txt.style.top = 320;
+				this.txt.style.left = 8;
 				this.txt.style.position = "absolute"
 
 				this.box.div.style.left = -6;
@@ -37,7 +38,7 @@ sand.define('Banner',['Case'], function (r) {
 				this.div.style.top = 20;
 
 				this.band = document.createElement('div');
-				this.band.style.width = 880;
+				this.band.style.width = 1034;
 				this.band.style.height = 85;
 				this.band.style.backgroundColor = "8c8fc2";
 
@@ -47,10 +48,11 @@ sand.define('Banner',['Case'], function (r) {
 				this.txt.style.fontFamily = "cbi";
 				this.txt.style.fontSize = 60;
 				this.txt.innerHTML = "STORIES";
-				this.txt.style.cssFloat = "right";
-
-				this.box = new Case({ width : 183 , height : 87 , prefix : "berenger", imgSrc : options.logo, type : "img"})
-				this.box.div.style.left = 880;
+				this.txt.style.position = "absolute";
+				this.txt.style.left = 713;
+				this.txt.style.top = -3;
+				this.box = new Case({ width : 42 , height : 72 , prefix : "berenger", imgSrc : options.logo, type : "img"})
+				this.box.div.style.left = 1034;
 				this.box.div.style.top = -8;
 				this.div.appendChild(this.band);
 				this.div.appendChild(this.box.div);

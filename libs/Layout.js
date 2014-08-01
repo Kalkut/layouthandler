@@ -132,17 +132,22 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			}
 
 			this.el.appendChild(this.banner.div);
+			this.menu.el.style.left = -10;
+			this.menu.el.style.top = 15;
 			this.banner.band.appendChild(this.menu.el);
 			this.slides.push(this);
 
 
 			for (var i = 0, n = this.positions.length; i < n; i++) {
 				if (this.type === 'moods') {
+					var imgIndex;
+					i < 5 ? imgIndex = i : imgIndex = i-1;
+
 					var tempCase = new Case({
 						width: this.positions[i][2],
 						height: this.positions[i][3],
 						type: i === 5 ? 'txt' : 'img',
-						imgSrc: options.imgSrcs[i],
+						imgSrc: options.imgSrcs[imgIndex],
 						prefix: options.prefix
 					})
 					var tempSlide = new Slide({
@@ -155,19 +160,20 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						comment : options.comments[i]||"",
 						box: {
 							prefix: "berenger",
-							width: 650,
-							height: 575,
-							imgSrc: options.imgSrcs[i],
+							width: 773,
+							height: 591,
+							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true
 						}
 					})
 				} else if (this.type === 'stories') {
+					i < 3 ? imgIndex = i : imgIndex = i-1;
 					var tempCase = new Case({
 						width: this.positions[i][2],
 						height: this.positions[i][3],
 						type: i === 3 ? 'txt' : 'img',
-						imgSrc: options.imgSrcs[i],
+						imgSrc: options.imgSrcs[imgIndex],
 						prefix: options.prefix
 					})
 					var tempSlide = new Slide({
@@ -181,9 +187,9 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						signatures : options.signatures[i+1],
 						box: {
 							prefix: "berenger",
-							width: 700,
-							height: 600,
-							imgSrc: options.imgSrcs[i],
+							width: 637,
+							height: 597,
+							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
 						}
@@ -203,6 +209,9 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					}.bind(this).curry(k,i+1))
 				}
 
+				var imgIndex;
+				i >= 3 ? imgIndex = i : imgIndex = i
+				
 				tempSlide.on("bp:update", function (index,signature,bptext) {
 					this.fire("bp:updated", index,signature,bptext);
 				}.bind(this).curry(i+1))
@@ -249,9 +258,16 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.el.appendChild(this.cases[i].div);
 			}
 
+
+			if(this.type === "moods"){
+				this.slides.splice(5,1)
+			} else if (this.type === "stories") {
+				this.slides.splice(3,1)
+			};
+
 			this.curSlide = 0;
 
-			document.body.addEventListener("keydown", function (e) {
+			document.body.addEventListener("keydown", function (e) { // EVENEMENT DU DEROULEMENT DES SLIDES
 				if (e.keyCode === 37 && this.curSlide) {
 					this.slides[this.curSlide].hide();
 					this.curSlide--;
