@@ -29,6 +29,8 @@ sand.define('Case', function (r) {
 			this.type = options.type;
 			this.fit = options.fit
 			this.pos = options.pos;
+			this.keyPressed = {};
+			this.cursorOver = false
 			
 			this.div = toDOM({
 				tag : 'div.' + options.prefix + "-case-idle",
@@ -74,6 +76,7 @@ sand.define('Case', function (r) {
 			} else if (this.type === 'img') {
 				this.div.appendChild(this.img);
 				this.clicking;
+				this.cursorOver;
 				this.posClick = [this.img.width/2,this.img.height/2];
 				this.selected = false;
 				this.z = 0;
@@ -84,14 +87,19 @@ sand.define('Case', function (r) {
 				}.bind(this)
 				this.div.onmouseup = function (e) {
 					e.preventDefault();
-					this.clicking = false
+					this.clicking = false;
 				}.bind(this)
 
 				this.div.onmouseout = function () {
 					this.clicking = false;
+					this.cursorOver = false;
 				}.bind(this);
+
+				this.div.onmouseover = function () {
+					this.cursorOver = true;
+				}.bind(this)
 				
-				document.body.addEventListener('keydown',function (e) {
+				/*document.body.addEventListener('keydown',function (e) {
 					if(this.selected) {
 						var length = parseInt(this.img.style.width);
 						if(e.keyCode === 107) {
@@ -104,10 +112,42 @@ sand.define('Case', function (r) {
 							}
 						}
 					}
-				}.bind(this));
+				}.bind(this));*/
+
+
+				/*this.div.onkeydown = function (e) {
+					this.shiftPressed = e.keyCode === 18;
+					console.log(this.shiftPressed);
+				}.bind(this)*/
+
+				document.body.addEventListener('keydown', function (e) {
+					
+					this.keyPressed[e.keyCode] = [true,this.selected];
+					console.log(this.keyPressed[e.keyCode])
+					
+				}.bind(this))
+
+				document.body.addEventListener('keyup', function (e) {
+					delete this.keyPressed[e.keyCode];
+				}.bind(this))
+
+				this.div.addEventListener('mousewheel', function (e) {
+					//console.log(this.keyPressed[16]);
+					//console.log(this.cursorOver)
+					//console.log(this.keyPressed[16] && this.cursorOver)
+					if(this.keyPressed[16]){
+						e.preventDefault();
+						var length = parseInt(this.img.style.width);
+						var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+						length+= delta*5;
+						this.zoom(length);
+					}
+				}.bind(this))
+
+
 
 				this.img.onclick = function (e) {
-					console.log(e.clientX - this.offsetLeft, e.clientY - this.offsetTop);
+					//console.log(e.clientX - this.offsetLeft, e.clientY - this.offsetTop);
 				}
 				
 				var imgMove = function (e) {
@@ -137,17 +177,17 @@ sand.define('Case', function (r) {
 						this.img.style.left = this.pos[0];
 						this.img.style.top = this.pos[1];
 					} else {
-					this.img.style.height = this.img.naturalHeight;
-					this.img.style.width = this.img.naturalWidth;
-					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
-					
-					var height = parseInt(this.div.style.height);
-					var width = parseInt(this.div.style.width);
-					var ratioDiv = height/width;
-					
-					if (this.ratio > ratioDiv) this.zoom(width,false,true);
-					else this.zoom(height,true,true);
-				}
+						this.img.style.height = this.img.naturalHeight;
+						this.img.style.width = this.img.naturalWidth;
+						this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
+
+						var height = parseInt(this.div.style.height);
+						var width = parseInt(this.div.style.width);
+						var ratioDiv = height/width;
+
+						if (this.ratio > ratioDiv) this.zoom(width,false,true);
+						else this.zoom(height,true,true);
+					}
 
 				}.bind(this))
 				
@@ -165,8 +205,8 @@ sand.define('Case', function (r) {
 				this.img.style.width = newLength/this.ratio;
 			}
 			if(!init){
-			this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
-			this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
+				this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
+				this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 			}
 		}
 

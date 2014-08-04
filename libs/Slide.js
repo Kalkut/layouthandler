@@ -10,7 +10,6 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			this.box.div.addEventListener("mousedown", function () {
 				this.fire('selection', "pic");
 			}.bind(this))
-			options.box.pos ? console.log(options.box) : console.log('quedalle');
 			this.type = options.type;
 			var scp = {};
 			this.prefix = options.prefix;
