@@ -136,11 +136,14 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			this.menu.el.style.top = 15;
 			this.banner.band.appendChild(this.menu.el);
 			this.slides.push(this);
+			var imgIndex;
+			var slidesIndex;
 
 
 			for (var i = 0, n = this.positions.length; i < n; i++) {
 				if (this.type === 'moods') {
-					var imgIndex;
+					
+					i < 5 ? slidesIndex = i+1 : slidesIndex = i;
 					i < 5 ? imgIndex = i : imgIndex = i-1;
 					var tempCase = new Case({
 						width: this.positions[i][2],
@@ -165,10 +168,11 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
-							pos : (options.positions && options.positions.moods && options.positions.moods[i]) ? options.positions.moods[i][0] : null
+							pos : (options.positions && options.positions.moods && options.positions.moods[slidesIndex]) ? options.positions.moods[slidesIndex][0] : null
 						}
 					})
 				} else if (this.type === 'stories') {
+					i < 3 ? slidesIndex = i+1 : slidesIndex = i;
 					i < 3 ? imgIndex = i : imgIndex = i-1;
 					var tempCase = new Case({
 						width: this.positions[i][2],
@@ -194,7 +198,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
-							pos : (options.positions && options.positions.stories && options.positions.stories[i]) ? options.positions.stories[i][0] : null
+							pos : (options.positions && options.positions.stories && options.positions.stories[slidesIndex]) ? options.positions.stories[slidesIndex][0] : null
 						}
 					})
 				}
