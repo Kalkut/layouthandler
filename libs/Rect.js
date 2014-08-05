@@ -85,7 +85,10 @@ sand.define('Geo/Rect', [
     move: function(options) {
       var nRect = this.clone();
 
-      var vector = options.vector; var center = options.center; var scale = options.scale; var staticPoint = ( options.staticPoint ) ? options.staticPoint.clone() : false;
+      var vector = options.vector; 
+      var center = options.center; 
+      var scale = options.scale; 
+      var staticPoint = ( options.staticPoint ) ? options.staticPoint.clone() : false;
       
       if (staticPoint && scale) {
         if (staticPoint.isPoint) staticPoint = staticPoint.inRef(this.ref).getValue();

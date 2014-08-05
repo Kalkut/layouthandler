@@ -128,6 +128,12 @@
                   (this[1] < 0 ? -1 : 1 )*Math.PI/2 : 
                   Math.atan(this[1]/this[0])
               )
+        },
+
+        clone : function () {
+          var nTab = [];
+          nTab.push.apply(nTab,this);
+          return nTab;
         }
     });
 }));
