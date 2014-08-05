@@ -137,6 +137,14 @@ this.div.addEventListener('mousewheel', function (e) {
 			this.zoom(factor);
 			this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]);
 			this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
+			this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
+			this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
+		} else if(this.fit){
+			this.zoom(factor);
+			this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]);
+			this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
+			this.fire('imgMoved',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
+			this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 		}
 	}
 }.bind(this))
@@ -207,6 +215,7 @@ var imgMove = function (e) {
 
 					this.imgRect = new r.Geo.Rect({ segX : segX, segY : segY, ref : new r.Geo.Ref({ origin : [imgX,imgY], factor : 1})});
 					this.divRect = new r.Geo.Rect({ segX : segDivX, segY : segDivY});
+					this.fire('update:position',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 
 				}.bind(this))
 
