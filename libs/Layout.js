@@ -214,6 +214,10 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					tempSlide.cases[k].on('imgMoved', function (k , i, x, y, width, height) {
 						this.fire('anImgMoved', x, y, width, height, k, i);
 					}.bind(this).curry(k,i+1))
+
+					tempSlide.cases[k].on('case:over', function (k,i) {
+						this.fire('layout:case:over',k,i);
+					}.bind(this).curry(k,i+1))
 				}
 
 				var imgIndex;

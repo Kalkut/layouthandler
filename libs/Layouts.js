@@ -1,4 +1,4 @@
-sand.define('Layouts',['Layout'], function (r) {
+sand.define('Layouts',['Layout','Geo/*'], function (r) {
 	var Layout = r.Layout;
 	return Seed.extend({
 
@@ -31,37 +31,24 @@ sand.define('Layouts',['Layout'], function (r) {
 				this.fire('changedLayout',this.layout.menu.value);
 			}.bind(this);
 
-			/*this.on('newLayout', function () {	
-				if (this.data.positions[this.layout.type]) {
-					for(var indiceSlides in this.data.positions[this.layout.type]) {
-						for (var indice in this.data.positions[this.layout.type][indiceSlides]) {
-							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width = this.data.positions[this.layout.type][indiceSlides][indice][2];
-							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = this.data.positions[this.layout.type][indiceSlides][indice][3];
-							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = this.data.positions[this.layout.type][indiceSlides][indice][0];
-							this.layout.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = this.data.positions[this.layout.type][indiceSlides][indice][1];
-						}
-					}
+		},
+
+		toLayout : function (type) {
+			if(this.layout){
+				this.data.type = type;
+				var daddy = this.layout.elt.parentNode;
+				daddy.removeChild(this.layout.elt);
+				this.layout = this.create(Layout,this.data);
+				daddy.appendChild(this.layout.elt);
+			}else {
+				this.layout = this.create(Layout,this.data);
+			}
+
+			for (var indice in this.data.comments) {
+				if(indice != 0 && this.data.type === "moods") {
+					this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
 				}
-			}.bind(this))*/
-
-},
-
-toLayout : function (type) {
-	if(this.layout){
-		this.data.type = type;
-		var daddy = this.layout.elt.parentNode;
-		daddy.removeChild(this.layout.elt);
-		this.layout = this.create(Layout,this.data);
-		daddy.appendChild(this.layout.elt);
-	}else {
-		this.layout = this.create(Layout,this.data);
-	}
-
-	for (var indice in this.data.comments) {
-		if(indice != 0 && this.data.type === "moods") {
-			this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
-		}
-	}
+			}
 		//this.data.bulletPoints[index][signature] = bptext
 		this.layout.on("bp:updated", function (index,signature,bptext) {
 			this.fire("BulletPoint", index,signature,bptext);
@@ -130,6 +117,34 @@ toLayout : function (type) {
 		}.bind(this))
 
 		this.fire('newLayout');
+
+		this.caseRectArray = [];
+
+		for(var i = 0, n = this.layout.slides[0].cases.length ; i < n; i++){
+			var currentCase = this.layout.slides[0].cases[i]
+			var currentCaseRect = new r.Geo.Rect({ 
+				segX : new r.Geo.Seg( parseInt(currentCase.div.style.left), parseInt(currentCase.div.style.left) + parseInt(currentCase.div.style.width) ), 
+				segY : new r.Geo.Seg(parseInt(currentCase.div.style.top), parseInt(currentCase.div.style.top) + parseInt(currentCase.div.style.height) ), 
+			});
+			this.caseRectArray.push(currentCaseRect);
+		}
+
+		this.layout.slides[0].el.addEventListener('mousemove', function (e) {
+			this.cursorPosition = [e.clientX -this.layout.slides[0].el.offsetLeft,e.clientY - this.layout.slides[0].el.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]);
+			console.log(this.cursorPosition[0],this.cursorPosition[1]);
+		}.bind(this))
 	},
+
+	handleDrop : function (pos,src) {
+		for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
+			if( this.caseRectArray[i].contains(pos) ){
+				var oldSrc = this.layout.slides[0].cases[i].img.src;
+				this.layout.slides[0].cases[i].img.src = src;
+				this.layout.slides[0].cases[i].loadCase();
+				return [i,oldSrc];
+			}
+		}
+		return false;
+	}
 })
 })
