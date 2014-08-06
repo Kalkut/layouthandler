@@ -119,6 +119,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 		this.fire('newLayout');
 
 		this.caseRectArray = [];
+		this.draggedDiv;
 
 		for(var i = 0, n = this.layout.slides[0].cases.length ; i < n; i++){
 			var currentCase = this.layout.slides[0].cases[i]
@@ -131,8 +132,47 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 		this.layout.slides[0].el.addEventListener('mousemove', function (e) {
 			this.cursorPosition = [e.clientX -this.layout.slides[0].el.offsetLeft,e.clientY - this.layout.slides[0].el.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]);
-			console.log(this.cursorPosition[0],this.cursorPosition[1]);
+			if(this.draggedDiv) {
+				if( this.cursorPosition[0] > 0 && this.cursorPosition[0] < (parseInt(this.layout.slides[0].el.style.width) -15) && 0 < this.cursorPosition[1] && (parseInt(this.layout.slides[0].el.style.height) - 15) > this.cursorPosition[1]){
+					this.draggedDiv.style.left = this.cursorPosition[0];
+					this.draggedDiv.style.top = this.cursorPosition[1];
+				} else {
+					this.fire('layouts:draggableImageOut',this.draggedDiv.childNodes[0].src, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
+					this.layout.slides[0].el.removeChild(this.draggedDiv);
+					this.draggedDiv = null;
+					this.dragIndex = null;
+				}
+			}
 		}.bind(this))
+
+		this.layout.slides[0].el.addEventListener('mousedown', function (e) {
+			if(e.shiftKey){
+				for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
+					if( this.caseRectArray[i].contains(this.cursorPosition) ){
+						this.draggedDiv =  this.layout.slides[0].cases[i].div.cloneNode(true);
+						this.draggedDiv.style.left = this.cursorPosition[0];
+						this.draggedDiv.style.top = this.cursorPosition[1];
+						this.layout.slides[0].el.appendChild(this.draggedDiv);
+						this.dragIndex = i;
+					}
+				}
+			}
+		}.bind(this))
+
+		this.layout.slides[0].el.addEventListener('mouseup', function (e) {
+			if(this.draggedDiv){
+				var oldSrc = this.layout.slides[0].cases[this.dragIndex].img.src;
+				var dropResult = this.handleDrop(this.cursorPosition,oldSrc);
+				if (dropResult) {
+					this.layout.slides[0].cases[this.dragIndex].img.src = dropResult[1];
+					this.layout.slides[0].cases[this.dragIndex].loadCase();	
+				}
+				this.layout.slides[0].el.removeChild(this.draggedDiv);
+				this.draggedDiv = null;
+				this.dragIndex = null;
+			}
+		}.bind(this))
+
 	},
 
 	handleDrop : function (pos,src) {
