@@ -74,12 +74,13 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				{ label : 'STORIES', id : 'stories' }
 				],
 				change : function(choice) {
-					this.fire('changeLayout',choice.id)
+					this.fire('layout:slide:changedLayout',choice.id) // Raccourci : Le signal changedLayout viens de la couverture et non d'une slide
 				}.bind(this),
 
 			def : this.type // l'identifiant de la valeur par défaut
 		})
 
+			/*Bouton du menu de la cover*/
 			var icon = document.createElement('div');
 			icon.className +=" picto-"+options.type;
 			this.menu.trigger.appendChild(icon);
@@ -113,8 +114,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}
 			})
 
-
-
+			/*choix de la bannière*/
 			if (this.type === 'moods') {
 				this.positions = positions.moods
 				this.banner = new Banner({
@@ -139,7 +139,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			var imgIndex;
 			var slidesIndex;
 
-			/*Initialisation des cases et des slides*/
+			/*Initialisation des cases et des slides : VERY FAT LOOP*/
 			for (var i = 0, n = this.positions.length; i < n; i++) {
 				if (this.type === 'moods') {
 					
@@ -172,8 +172,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						}
 					})
 				} else if (this.type === 'stories') {
-					i < 3 ? slidesIndex = i+1 : slidesIndex = i;
-					i < 3 ? imgIndex = i : imgIndex = i-1;
+					i < 3 ? slidesIndex = i+1 : slidesIndex = i; // slideIndex € [1,5]
+					i < 3 ? imgIndex = i : imgIndex = i-1; // imgIndex € [0,4]
 					var tempCase = new Case({
 						width: this.positions[i][2],
 						height: this.positions[i][3],
@@ -203,16 +203,19 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					})
 				}
 
-				tempSlide.hide();
+				tempSlide.hide(); //Cachée mais ajoutée au DOM
 
-				tempSlide.on('layout:changed', function (type) {
-					this.fire('changeLayout',type);
+				/*Transferts de tout les abonnements des objets instanciés dans layout*/
+
+				/*Transfert du changement de layout depuis une slide*/
+				tempSlide.on('slide:changedLayout', function (type) {
+					this.fire('layout:slide:changedLayout',type);
 				}.bind(this))
 
-
-				for(var k = 0, l = tempSlide.cases.length; k < l; k++) {
-					tempSlide.cases[k].on('imgMoved', function (k , i, x, y, width, height) {
-						this.fire('anImgMoved', x, y, width, height, k, i);
+				/*Transfert de la position CSS de l'image d'une case et du passage du curseur au dessus d'une case*/
+				for(var k = 0, l = tempSlide.cases.length; k < l; k++) {//CASE to SLIDE
+					tempSlide.cases[k].on('case:imageMovedPx', function (k , i, x, y, width, height) {
+						this.fire('layout:case:imageMovedPx', x, y, width, height, k, i);
 					}.bind(this).curry(k,i+1))
 
 					tempSlide.cases[k].on('case:over', function (k,i) {
@@ -220,32 +223,33 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					}.bind(this).curry(k,i+1))
 				}
 
-				var imgIndex;
-				i >= 3 ? imgIndex = i : imgIndex = i
-				
-				tempSlide.on("bp:update", function (index,signature,bptext) {
-					this.fire("bp:updated", index,signature,bptext);
+				/*Transferts des informations relatives à un Bullet Point (slides de type stories)*/				
+				tempSlide.on("slide:changedBP", function (index,signature,bptext) {
+					this.fire("layout:slide:changedBP", index,signature,bptext);
 				}.bind(this).curry(i+1))
 
-				tempSlide.on('newLine' , function (index, signature , nbLines) {
-					this.fire('lineAdded', index, signature, nbLines)
-				}.bind(this).curry(i+1));
-				//tempSlide.addLine({keyCode : 13});
-
-				tempSlide.on("lineDestroyed" , function (index,signature) {
-					this.fire('lineRemoved', index, signature)
+				/*Nouveau Bullet Point (slides de type stories) */
+				tempSlide.on('slide:lineAdded' , function (index, signature , nbLines) {
+					this.fire('layout:slide:lineAdded', index, signature, nbLines)
 				}.bind(this).curry(i+1));
 
-				tempSlide.on('commentChanged', function (i,comment) {
-					this.fire('changeComment',i,comment);
+				/*Destruction d'un Bullet Point (slides de type stories)*/
+				tempSlide.on("slide:lineRemoved" , function (index,signature) {
+					this.fire('layout:slide:lineRemoved', index, signature)
+				}.bind(this).curry(i+1));
+
+				/*Edition d'un commentaire (slides de type moods)*/
+				tempSlide.on('slide:changedComment', function (i,comment) {
+					this.fire('layout:slide:changedComment',i,comment);
 				}.bind(this).curry(i+1))
 
-				tempSlide.on('changeSlidesTitle', function (title) {
-					this.fire('changeTheTitleEverywhere', title);
-					this.fire('getTitle', title);
+				/*Edition d'un titre depuis une Slide*/
+				tempSlide.on('slide:titleChanged', function (title) {
+					this.fire('layout:updateTitle', title);
+					this.fire('layout:getTitle', title);
 				}.bind(this))
 
-				if (tempCase.type = 'img') {
+				if (tempCase.type = 'img') {// IMPORTANT : Si la slide crée ne correspond pas à une Case de type 'img' elle n'est pas ajoutée --> Décalage d'indice à partir de 5 ou 3 selon le type de slide
 					this.slides.push(tempSlide);
 				} 
 
@@ -253,21 +257,17 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 				this.cases[i].selected = false;
 				
-				this.cases[i].div.style.left = this.positions[i][0];
+				this.cases[i].div.style.left = this.positions[i][0];// positionement des CASES du layout
 				this.cases[i].div.style.top = this.positions[i][1];
 				
-				this.cases[i].div.addEventListener("mousedown", function (i) {
-					this.fire('selection', i);
+				this.cases[i].on('case:imageMovedPx', function (i, x, y, width, height) {//Update du mouvement des cases de la couverture
+					this.fire('layout:case:imageMovedPx', x, y, width,height, i, 0);
 				}.bind(this).curry(i))
 				
-				this.cases[i].on('imgMoved', function (i, x, y, width, height) {
-					this.fire('anImgMoved', x, y, width,height, i, 0);
-				}.bind(this).curry(i))
-				
-				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
-					tempCase.on('titleChanged', function (title) {
-						this.fire('changeTheTitleEverywhere', title);
-						this.fire('getTitle',title);
+				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {// Update des titres depuis la Case de type titre
+					tempCase.on('case:titleChanged', function (title) {
+						this.fire('layout:updateTitle', title);
+						this.fire('layout:getTitle',title);
 					}.bind(this))
 				}
 				
@@ -275,13 +275,13 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			}
 
 
-			if(this.type === "moods"){
+			if(this.type === "moods"){//Elimination de la slide image en trop (à revoir, indispensable mais ne devrait pas être nécessaire )
 				this.slides.splice(5,1)
 			} else if (this.type === "stories") {
 				this.slides.splice(3,1)
 			};
 
-			this.curSlide = 0;
+			this.curSlide = 0; //Slide en cours (initialisation sur la couverture aka slide 0)
 
 			document.body.addEventListener("keydown", function (e) { // EVENEMENT DU DEROULEMENT DES SLIDES
 				if (e.keyCode === 37 && this.curSlide) {//LEFT ARROW
@@ -295,7 +295,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}
 			}.bind(this))
 
-			this.on('changeTheTitleEverywhere', function (title) {
+			/*Mise a jour du titre dans la couv et dans les slides*/
+			this.on('layout:updateTitle', function (title) {
 				if (this.type === 'moods') {
 					this.slides[0].cases[5].txtBloc.children[0].children[0].children[0].innerHTML = title
 				} else if (this.type === 'stories') {
@@ -307,17 +308,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.title = title;
 			}.bind(this))
 
-			this.on('selection', function (i) {
-				if (this.selectionIndex || this.selectionIndex === 0) {
-					this.cases[this.selectionIndex].div.className = options.prefix + "-case-idle";
-					this.cases[this.selectionIndex].selected = false
-				}
-
-				this.cases[i].div.className = options.prefix + "-case-selected";
-				this.cases[i].selected = true;
-				this.selectionIndex = i;
-			})
-
+			/*On rassemble le tout dans un bon gros div*/
 			this.elt = document.createElement('div');
 			this.elt.appendChild(this.el)
 			for(var i = 1, n = this.slides.length; i < n; i++) {

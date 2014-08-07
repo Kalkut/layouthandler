@@ -3,6 +3,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 	return Seed.extend({
 
 		'+init' : function (data) {
+			
 			this.data = jQuery.extend({},data);
 			this.data.comments = this.data.comments || {};
 			this.data.positions = this.data.positions || {};
@@ -14,10 +15,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.toLayout(this.data.type);
 			this.title;
 
-
-
-
-			this.on('changedLayout', function (type) {
+			this.on('layouts:layout:slide:changedLayout', function (type) {
 				this.title = this.layout.title
 				this.toLayout(type);
 				if(type === "stories") {
@@ -28,17 +26,13 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 						this.layout.slides[i].bloc.children[1].innerHTML = this.data.comments[i]||null;
 					}
 				}
-				this.layout.fire('changeTheTitleEverywhere',this.title||"");
+				this.layout.fire('layout:updateTitle',this.title||"");
 			}.bind(this))
-
-
-			this.layout.menu.onchange = function () {
-				this.fire('changedLayout',this.layout.menu.value);
-			}.bind(this);
 
 		},
 
 		toLayout : function (type) {
+			
 			this.data.type = type;
 
 			if(this.layout){
@@ -57,9 +51,10 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
 				}
 			}
+
 		//this.data.bulletPoints[index][signature] = bptext
-		this.layout.on("bp:updated", function (index,signature,bptext) {
-			this.fire("BulletPoint", index,signature,bptext);
+		this.layout.on("layout:slide:changedBP", function (index,signature,bptext) {
+			this.fire("layouts:layout:slide:changedBP", index,signature,bptext);
 			if(this.data.bulletPoints[index] || this.data.bulletPoints[index] === {}){
 				if(this.data.bulletPoints[index][signature] || this.data.bulletPoints[index][signature] === "") {
 					this.data.bulletPoints[index][signature] = bptext
@@ -71,7 +66,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 		}.bind(this))
 
-		this.layout.on("lineAdded", function (index, signature,nbLignes) {
+		this.layout.on("layout:slide:lineAdded", function (index, signature,nbLignes) {
 			this.data.signatures[index][nbLignes-1] = signature;
 		}.bind(this))
 
@@ -85,7 +80,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 		}
 
-		this.layout.on("lineRemoved", function (index, signature) {
+		this.layout.on("layout:slide:lineRemoved", function (index, signature) {
 			var deleteIndex = this.data.signatures[index].indexOf(signature);
 			if (deleteIndex > -1){
 				this.data.signatures[index].splice(deleteIndex,1);
@@ -94,21 +89,21 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 		}.bind(this))
 
-		this.layout.on('changeLayout', function (type) {
-			this.fire('changedLayout',type)
+		this.layout.on('layout:slide:changedLayout', function (type) {
+			this.fire('layouts:layout:slide:changedLayout',type)
 		}.bind(this));
 
-		this.layout.on('changeComment', function (i , comment) {
+		this.layout.on('layout:slide:changedComment', function (i , comment) {
 			var ind = i >= 5 ? i-1 : i;
 			this.data.comments[ind] = comment;
-			this.fire('comment:change', ind , comment);
+			this.fire('layouts:layout:slide:changedComment', ind , comment);
 		}.bind(this))
 
-		this.layout.on('getTitle', function (title) {
-			this.fire("newTitle",title);
+		this.layout.on('layout:getTitle', function (title) {
+			this.fire("layout:layouts",title);
 		}.bind(this))
 
-		this.layout.on('anImgMoved', function (x , y , width, height , i , k) {
+		this.layout.on('layout:case:imageMovedPx', function (x , y , width, height , i , k) {
 			if(this.layout.type === "moods") var key = k >= 5 ? k-1 : k;
 			else if(this.layout.type === "stories") var key = k >= 3 ? k-1 : k;
 
@@ -121,14 +116,12 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}else {
 				this.data.positions[this.layout.type] = {};
 			}
-			this.fire('image:moved',[x,y,width,height],key,i);
+			this.fire('layouts:layout:case:imageMovedPx',[x,y,width,height],key,i);
 		}.bind(this))
 
-		this.fire('newLayout');
-
 		this.caseRectArray = [];
-		this.draggedDiv;
-
+		
+		/*Une Case sur la couverture = un Rectangle --> sert à la detection de la case pour le D&D*/
 		for(var i = 0, n = this.layout.slides[0].cases.length ; i < n; i++){
 			var currentCase = this.layout.slides[0].cases[i]
 			var currentCaseRect = new r.Geo.Rect({ 
@@ -138,6 +131,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.caseRectArray.push(currentCaseRect);
 		}
 
+		this.draggedDiv;
+
+		/*Mouvement de la miniature en D&D*/
 		this.layout.slides[0].el.addEventListener('mousemove', function (e) {
 			this.cursorPosition = [e.clientX -this.layout.slides[0].el.offsetLeft,e.clientY - this.layout.slides[0].el.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]);
 			if(this.draggedDiv) {
@@ -146,13 +142,11 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					this.draggedDiv.style.top = this.cursorPosition[1];
 				} else {
 					this.fire('layouts:draggableImageOut',this.draggedDiv.childNodes[0].src, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
-					// this.layout.slides[0].el.removeChild(this.draggedDiv);
-					// this.draggedDiv = null;
-					// this.dragIndex = null;
 				}
 			}
 		}.bind(this))
 
+		/*Detection du shift+click -> début du D&D*/
 		this.layout.slides[0].el.addEventListener('mousedown', function (e) {
 			if(e.shiftKey){
 				for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
@@ -167,6 +161,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 		}.bind(this))
 
+		/*Lacher de souris -> gestion de la fin du drag&drop*/
 		this.layout.slides[0].el.addEventListener('mouseup', function (e) {
 			if(this.draggedDiv){
 				var oldSrc = this.layout.slides[0].cases[this.dragIndex].img.src;
@@ -175,7 +170,6 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					this.layout.slides[0].cases[this.dragIndex].img.src = dropResult[1];
 					this.layout.slides[0].cases[this.dragIndex].loadCase();
 					this.layout.fire('layout:dragSuccessful',dropResult[1], dropResult[0], oldSrc, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])	
-
 				}
 				this.layout.slides[0].el.removeChild(this.draggedDiv);
 				this.draggedDiv = null;
@@ -183,8 +177,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 		}.bind(this))
 
+		/*Echange des images suite au succès d'un D&D*/
 		this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { // Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
-			this.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
+			this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
 			if(this.data.type === "moods"){
 				(newIndex < 5) ? newIndex: newIndex--;
 				(oldIndex < 5) ? oldIndex : oldIndex--;
@@ -196,8 +191,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.data.imgSrcs[oldIndex] = newSrc;
 		}.bind(this))
 
-		this.on('layouts:slidesExchanged', function (newSrc,newIndex,oldSrc,oldIndex,type) {
-			if(type === "moods"){
+		/*Echange des infos des slides suite au succès d'un D&D*/
+		this.layout.on('layouts:slidesExchanged', function (newSrc,newIndex,oldSrc,oldIndex,type) {
+			if(type === "moods") {
 				newIndex < 5 ? newIndex++ : newIndex;
 				oldIndex < 5 ? oldIndex++ : oldIndex;
 
@@ -209,20 +205,16 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				this.layout.slides[newIndex].bloc.children[1].innerHTML = this.data.comments[newIndex] ? this.data.comments[newIndex] : "";
 
 			}
-			else if(type === "stories"){
+			else if(type === "stories") {
 				newIndex < 3 ? newIndex++ : newIndex;// index € [0,1,2,4,5]
 				oldIndex < 3 ? oldIndex++ : oldIndex;
 				//now index € [1,2,3,4,5]
-
+				console.log('patrick')
 				var oldBuffer = this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1].clone(); //need index € [1,2,4,5,6]
 				var newBuffer = this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1].clone();
 				
-				console.log(this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1],this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1] );
-				
 				this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1] = oldBuffer;
 				this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1] = newBuffer;
-
-				console.log(this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1],this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1] );
 			}
 
 			this.layout.slides[newIndex].cases[0].img.src = oldSrc;
@@ -232,6 +224,8 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.layout.slides[oldIndex].cases[0].loadCase();
 
 		}.bind(this))
+
+	this.fire('layouts:layoutCreated');
 
 },
 
