@@ -1,58 +1,59 @@
-Function.prototype.curry = function () {
-	var self = this;
-	var args = Array.prototype.slice.call(arguments);
-	return function () {
-		return self.apply([], args.concat(Array.prototype.slice.call(arguments)));
-	};
-}
-
-var onimagesload = function (imgs,callback) {
-	var l = imgs.length;
-	var c = 0;
-	for (var i = 0; i < l; i++){
-		if(imgs[i].loaded) c++;
-		else imgs[i].onload = function () {
-			c++;
-			if (c === l) callback();
-		}
-	}
-
-	if (c === l) callback();
-}	
-
-
-var positions = {
-	moods: [
-	[120, 10, 225, 340],
-	[356, 10, 230, 290],
-	[598, 10, 230, 250],
-	[840, 10, 230, 215],
-	[120, 361, 224, 194],
-	[356, 310, 230, 245],
-	[598, 271, 230, 284],
-	[840, 235, 230, 320],
-	[120, 566, 118, 175],
-	[250, 566, 137, 175],
-	[399, 566, 135, 175],
-	[546, 566, 150, 175],
-	[708, 566, 362, 175]
-	],
-
-	stories: [
-	[30, 120, 338, 295],
-	[378, 120, 338, 295],
-	[726, 120, 338, 295],
-	[30, 425, 338, 295],
-	[378, 425, 338, 295],
-	[726, 425, 338, 295]
-	],
-}
-
 sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function (r) {
+	
 	var Slide = r.Slide;
 	var Banner = r.Banner;
 	var Case = r.Case;
 	var Selectbox = r.Selectbox;
+
+	Function.prototype.curry = function () {
+		var self = this;
+		var args = Array.prototype.slice.call(arguments);
+		return function () {
+			return self.apply([], args.concat(Array.prototype.slice.call(arguments)));
+		};
+	}
+
+	var onimagesload = function (imgs,callback) {
+		var l = imgs.length;
+		var c = 0;
+		for (var i = 0; i < l; i++){
+			if(imgs[i].loaded) c++;
+			else imgs[i].onload = function () {
+				c++;
+				if (c === l) callback();
+			}
+		}
+
+		if (c === l) callback();
+	}	
+
+
+	var positions = {
+		moods: [
+		[120, 10, 225, 340],
+		[356, 10, 230, 290],
+		[598, 10, 230, 250],
+		[840, 10, 230, 215],
+		[120, 361, 224, 194],
+		[356, 310, 230, 245],
+		[598, 271, 230, 284],
+		[840, 235, 230, 320],
+		[120, 566, 118, 175],
+		[250, 566, 137, 175],
+		[399, 566, 135, 175],
+		[546, 566, 150, 175],
+		[708, 566, 362, 175]
+		],
+
+		stories: [
+		[30, 120, 338, 295],
+		[378, 120, 338, 295],
+		[726, 120, 338, 295],
+		[30, 425, 338, 295],
+		[378, 425, 338, 295],
+		[726, 425, 338, 295]
+		],
+	}
 
 	return Seed.extend({
 
@@ -66,7 +67,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			this.type = options.type;
 			this.positions = options.positions || null;
 			this.slides = [];
-
+			
 			this.menu = new Selectbox({
 				choices : [
 				{ label : 'MOODS', id : 'moods' },
@@ -79,12 +80,11 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			def : this.type // l'identifiant de la valeur par défaut
 		})
 
-			var icon = new Image();
-			icon.src = "/damier.png";
+			var icon = document.createElement('div');
+			icon.className +=" picto-"+options.type;
+			this.menu.trigger.appendChild(icon);
+			this.menu.trigger.className += " picto-" + this.type
 
-			onimagesload([icon], function () {
-				this.menu.trigger.appendChild(icon)
-			}.bind(this));
 			this.menu["select-box"].style.left = 10;
 			this.menu["select-box"].style.zIndex = 1;
 			this.menu.fake.className += " " + this.type;
@@ -107,7 +107,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			this.el = toDOM({
 				tag: "div." + options.prefix + "-layout",
 				style: {
-					width: 1090,
+					width: 1090, //Taille en dur, pour respecter les proportions naturelles du layout
 					height: 760,
 					position: "absolute"
 				}
@@ -139,12 +139,12 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			var imgIndex;
 			var slidesIndex;
 
-
+			/*Initialisation des cases et des slides*/
 			for (var i = 0, n = this.positions.length; i < n; i++) {
 				if (this.type === 'moods') {
 					
-					i < 5 ? slidesIndex = i+1 : slidesIndex = i;
-					i < 5 ? imgIndex = i : imgIndex = i-1;
+					i < 5 ? slidesIndex = i+1 : slidesIndex = i; // slideIndex € [1,12]
+					i < 5 ? imgIndex = i : imgIndex = i-1;// imgInex € [0,11]
 					var tempCase = new Case({
 						width: this.positions[i][2],
 						height: this.positions[i][3],
@@ -252,20 +252,25 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.cases.push(tempCase);
 
 				this.cases[i].selected = false;
+				
 				this.cases[i].div.style.left = this.positions[i][0];
 				this.cases[i].div.style.top = this.positions[i][1];
+				
 				this.cases[i].div.addEventListener("mousedown", function (i) {
 					this.fire('selection', i);
 				}.bind(this).curry(i))
+				
 				this.cases[i].on('imgMoved', function (i, x, y, width, height) {
 					this.fire('anImgMoved', x, y, width,height, i, 0);
 				}.bind(this).curry(i))
+				
 				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
 					tempCase.on('titleChanged', function (title) {
 						this.fire('changeTheTitleEverywhere', title);
 						this.fire('getTitle',title);
 					}.bind(this))
 				}
+				
 				this.el.appendChild(this.cases[i].div);
 			}
 
@@ -279,11 +284,11 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			this.curSlide = 0;
 
 			document.body.addEventListener("keydown", function (e) { // EVENEMENT DU DEROULEMENT DES SLIDES
-				if (e.keyCode === 37 && this.curSlide) {
+				if (e.keyCode === 37 && this.curSlide) {//LEFT ARROW
 					this.slides[this.curSlide].hide();
 					this.curSlide--;
 					this.slides[this.curSlide].show();
-				} else if (e.keyCode === 39 && this.curSlide < this.slides.length - 1) {
+				} else if (e.keyCode === 39 && this.curSlide < this.slides.length - 1) {//RIGHT ARROW
 					this.slides[this.curSlide].hide();
 					this.curSlide++;
 					this.slides[this.curSlide].show();
@@ -301,17 +306,6 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}
 				this.title = title;
 			}.bind(this))
-
-			/*if (options.positions[this.type]) {
-				for(var indiceSlides in options.positions[this.type]) {
-					for (var indice in options.positions[this.type][indiceSlides]) {
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.left = options.positions[this.type][indiceSlides][indice][0];
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.top = options.positions[this.type][indiceSlides][indice][1];
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.width = options.positions[this.type][indiceSlides][indice][2];
-						this.slides[parseInt(indiceSlides)].cases[parseInt(indice)].img.style.height = options.positions[this.type][indiceSlides][indice][3];
-					}
-				}
-			}*/
 
 			this.on('selection', function (i) {
 				if (this.selectionIndex || this.selectionIndex === 0) {

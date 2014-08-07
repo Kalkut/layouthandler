@@ -9,8 +9,13 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.data.bulletPoints = this.data.bulletPoints || {};
 			this.data.signatures = this.data.signatures || {1: ["","","",""], 2:["","","",""], 4:["","","",""], 5:["","","",""], 6:["","","",""]};
 
-			this.toLayout();
+
+
+			this.toLayout(this.data.type);
 			this.title;
+
+
+
 
 			this.on('changedLayout', function (type) {
 				this.title = this.layout.title
@@ -34,13 +39,16 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 		},
 
 		toLayout : function (type) {
+			this.data.type = type;
+
 			if(this.layout){
-				this.data.type = type;
+
 				var daddy = this.layout.elt.parentNode;
 				daddy.removeChild(this.layout.elt);
 				this.layout = this.create(Layout,this.data);
 				daddy.appendChild(this.layout.elt);
 			}else {
+
 				this.layout = this.create(Layout,this.data);
 			}
 
@@ -138,9 +146,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					this.draggedDiv.style.top = this.cursorPosition[1];
 				} else {
 					this.fire('layouts:draggableImageOut',this.draggedDiv.childNodes[0].src, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
-					this.layout.slides[0].el.removeChild(this.draggedDiv);
-					this.draggedDiv = null;
-					this.dragIndex = null;
+					// this.layout.slides[0].el.removeChild(this.draggedDiv);
+					// this.draggedDiv = null;
+					// this.dragIndex = null;
 				}
 			}
 		}.bind(this))
@@ -165,7 +173,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				var dropResult = this.handleDrop(this.cursorPosition,oldSrc);
 				if (dropResult) {
 					this.layout.slides[0].cases[this.dragIndex].img.src = dropResult[1];
-					this.layout.slides[0].cases[this.dragIndex].loadCase();	
+					this.layout.slides[0].cases[this.dragIndex].loadCase();
+					this.layout.fire('layout:dragSuccessful',dropResult[1], dropResult[0], oldSrc, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])	
+
 				}
 				this.layout.slides[0].el.removeChild(this.draggedDiv);
 				this.draggedDiv = null;
@@ -173,18 +183,68 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 		}.bind(this))
 
-	},
-
-	handleDrop : function (pos,src) {
-		for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
-			if( this.caseRectArray[i].contains(pos) ){
-				var oldSrc = this.layout.slides[0].cases[i].img.src;
-				this.layout.slides[0].cases[i].img.src = src;
-				this.layout.slides[0].cases[i].loadCase();
-				return [i,oldSrc];
+		this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { // Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
+			this.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
+			if(this.data.type === "moods"){
+				(newIndex < 5) ? newIndex: newIndex--;
+				(oldIndex < 5) ? oldIndex : oldIndex--;
+			} else if(this.data.type === "stories"){
+				(newIndex < 3) ? newIndex : newIndex--;
+				(oldIndex < 3) ? oldIndex : oldIndex--;
 			}
+			this.data.imgSrcs[newIndex] = oldSrc;
+			this.data.imgSrcs[oldIndex] = newSrc;
+		}.bind(this))
+
+		this.on('layouts:slidesExchanged', function (newSrc,newIndex,oldSrc,oldIndex,type) {
+			if(type === "moods"){
+				newIndex < 5 ? newIndex++ : newIndex;
+				oldIndex < 5 ? oldIndex++ : oldIndex;
+
+				var oldBuffer = this.data.comments[oldIndex];
+				this.data.comments[oldIndex] = this.data.comments[newIndex];
+				this.data.comments[newIndex] = oldBuffer;
+				
+				this.layout.slides[oldIndex].bloc.children[1].innerHTML = this.data.comments[oldIndex] ? this.data.comments[oldIndex] : "";
+				this.layout.slides[newIndex].bloc.children[1].innerHTML = this.data.comments[newIndex] ? this.data.comments[newIndex] : "";
+
+			}
+			else if(type === "stories"){
+				newIndex < 3 ? newIndex++ : newIndex;// index € [0,1,2,4,5]
+				oldIndex < 3 ? oldIndex++ : oldIndex;
+				//now index € [1,2,3,4,5]
+
+				var oldBuffer = this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1].clone(); //need index € [1,2,4,5,6]
+				var newBuffer = this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1].clone();
+				
+				console.log(this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1],this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1] );
+				
+				this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1] = oldBuffer;
+				this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1] = newBuffer;
+
+				console.log(this.data.signatures[newIndex < 3 ? newIndex : newIndex + 1],this.data.signatures[oldIndex < 3 ? oldIndex : oldIndex + 1] );
+			}
+
+			this.layout.slides[newIndex].cases[0].img.src = oldSrc;
+			this.layout.slides[oldIndex].cases[0].img.src = newSrc;
+			
+			this.layout.slides[newIndex].cases[0].loadCase();
+			this.layout.slides[oldIndex].cases[0].loadCase();
+
+		}.bind(this))
+
+},
+
+handleDrop : function (pos,src) {
+	for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
+		if( this.caseRectArray[i].contains(pos) ){
+			var oldSrc = this.layout.slides[0].cases[i].img.src;
+			this.layout.slides[0].cases[i].img.src = src;
+			this.layout.slides[0].cases[i].loadCase();
+			return [i,oldSrc];
 		}
-		return false;
 	}
+	return false;
+}
 })
 })

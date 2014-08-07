@@ -84,3 +84,11 @@ table.berenger-case{
 .berenger-bulletpoint{
 	margin-right: 22;
 }
+
+.picto-moods,.picto-stories{
+	background-image : url('/damier.png');
+	width: 64px;
+	height: 40px;
+	margin-left: auto;
+	margin-right: auto;
+}

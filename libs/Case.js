@@ -1,4 +1,6 @@
-var onimagesload = function (imgs,callback) {
+sand.define('Case',["Geo/*"], function (r) {
+	
+	var onimagesload = function (imgs,callback) {
 	var l = imgs.length;
 	var c = 0;
 	for (var i = 0; i < l; i++){
@@ -11,8 +13,6 @@ var onimagesload = function (imgs,callback) {
 
 	if (c === l) callback();
 }
-
-sand.define('Case',["Geo/*"], function (r) {
 
 	return Seed.extend({
 		'+options' : {
@@ -177,7 +177,7 @@ var imgMove = function (e) {
 		},
 
 		loadCase : function (firstLoad) {
-			var loading = function() {
+			var loading = function () {
 
 				if(this.pos){
 					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);

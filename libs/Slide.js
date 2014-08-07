@@ -16,7 +16,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			this.bulletPoints = options.bulletPoints;
 			this.signatures = options.signatures || {};
 
-
+			/*Case du Logo, indice 1 dans this.cases*/
 			this.logoBox =  new Case({ width : 87 , height : 47 , prefix : "berenger", imgSrc : options.logo, type : "img", fit : true})
 			this.logoBox.div.id = "logo";
 			this.logoBox.div.style.left = 70;
