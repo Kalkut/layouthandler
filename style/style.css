@@ -2,6 +2,10 @@
 	margin: 6px;
 }
 
+.berenger-case{
+	outline: none;
+}
+
 @font-face{
 	font-family: "clr";
 	src : url("/canallightromain-webfont.woff");
@@ -95,4 +99,8 @@ table.berenger-case{
 
 .berenger-text{
 	outline: none;
+}
+
+.berenger-text{
+	margin-bottom: 20px;
 }

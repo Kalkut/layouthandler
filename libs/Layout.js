@@ -74,11 +74,11 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				{ label : 'STORIES', id : 'stories' }
 				],
 				change : function(choice) {
-					this.fire('layout:slide:changedLayout',choice.id) // Raccourci : Le signal changedLayout viens de la couverture et non d'une slide
+					this.fire('layout:slide:changedLayout',choice.id) // Raccourci : Le signal changedLayout viens de la couverture et non d'une "vraie" slide
 				}.bind(this),
 
-			def : this.type // l'identifiant de la valeur par défaut
-		})
+				def : this.type 
+			})
 
 			/*Bouton du menu de la cover*/
 			var icon = document.createElement('div');
@@ -190,7 +190,6 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						width: 1100,
 						height: 750,
 						bulletPoints : options.bulletPoints[i+1] || {},
-						signatures : options.signatures[i+1],
 						box: {
 							prefix: "berenger",
 							width: 637,
@@ -201,19 +200,19 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							pos : (options.positions && options.positions.stories && options.positions.stories[slidesIndex]) ? options.positions.stories[slidesIndex][0] : null
 						}
 					})
+
+					/*TRANSFERT DATA ABOUT BULLET POINTS*/				
+					tempSlide.on("slide:changedBP", function (slideIndex,text,index) {
+						this.fire("layout:slide:changedBP", slideIndex, text, index);
+					}.bind(this).curry(slidesIndex))
 				}
 
-				tempSlide.hide(); //Cachée mais ajoutée au DOM
+				tempSlide.hide();
 
-				/*Transferts de tout les abonnements des objets instanciés dans layout*/
+				
 
-				/*Transfert du changement de layout depuis une slide*/
-				tempSlide.on('slide:changedLayout', function (type) {
-					this.fire('layout:slide:changedLayout',type);
-				}.bind(this))
-
-				/*Transfert de la position CSS de l'image d'une case et du passage du curseur au dessus d'une case*/
-				for(var k = 0, l = tempSlide.cases.length; k < l; k++) {//CASE to SLIDE
+				/*CASE to LAYOUT : IMAGE DATA, CURSOR OVERLAPPING A CASE */
+				for(var k = 0, l = tempSlide.cases.length; k < l; k++) {
 					tempSlide.cases[k].on('case:imageMovedPx', function (k , i, x, y, width, height) {
 						this.fire('layout:case:imageMovedPx', x, y, width, height, k, i);
 					}.bind(this).curry(k,i+1))
@@ -223,67 +222,68 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					}.bind(this).curry(k,i+1))
 				}
 
-				/*Transferts des informations relatives à un Bullet Point (slides de type stories)*/				
-				tempSlide.on("slide:changedBP", function (index,signature,bptext) {
-					this.fire("layout:slide:changedBP", index,signature,bptext);
-				}.bind(this).curry(i+1))
+				/*TTFALT = TRIGGER THAT FIRES A LAYOUT TRIGGER*/
 
-				/*Nouveau Bullet Point (slides de type stories) */
-				tempSlide.on('slide:lineAdded' , function (index, signature , nbLines) {
-					this.fire('layout:slide:lineAdded', index, signature, nbLines)
-				}.bind(this).curry(i+1));
+				/*TTFALT : LAYOUT TYPE CHANGED*/
+				tempSlide.on('slide:changedLayout', function (type) {
+					this.fire('layout:slide:changedLayout',type);
+				}.bind(this))
 
-				/*Destruction d'un Bullet Point (slides de type stories)*/
-				tempSlide.on("slide:lineRemoved" , function (index,signature) {
-					this.fire('layout:slide:lineRemoved', index, signature)
-				}.bind(this).curry(i+1));
+				/*TTFALT : A NEW BULLET POINT IS ADDED*/
+				tempSlide.on('slide:lineAdded' , function () {
+					this.fire('layout:slide:lineAdded')
+				}.bind(this));
 
-				/*Edition d'un commentaire (slides de type moods)*/
+				/*TTFALT : A NEW BULLET POINT WAS REMOVED*/
+				tempSlide.on("slide:lineRemoved" , function () {
+					this.fire('layout:slide:lineRemoved')
+				}.bind(this));
+
+				/*TTFALT : A COMMENT WAS EDITED*/
 				tempSlide.on('slide:changedComment', function (i,comment) {
 					this.fire('layout:slide:changedComment',i,comment);
 				}.bind(this).curry(i+1))
 
-				/*Edition d'un titre depuis une Slide*/
+				/*TTFALT : A SLIDE EDITED THE TITLE*/
 				tempSlide.on('slide:titleChanged', function (title) {
 					this.fire('layout:updateTitle', title);
 					this.fire('layout:getTitle', title);
 				}.bind(this))
 
-				if (tempCase.type = 'img') {// IMPORTANT : Si la slide crée ne correspond pas à une Case de type 'img' elle n'est pas ajoutée --> Décalage d'indice à partir de 5 ou 3 selon le type de slide
+				if (tempCase.type = 'img') {// No picture, no slide
 					this.slides.push(tempSlide);
 				} 
 
 				this.cases.push(tempCase);
 
-				this.cases[i].selected = false;
-				
 				this.cases[i].div.style.left = this.positions[i][0];// positionement des CASES du layout
 				this.cases[i].div.style.top = this.positions[i][1];
 				
-				this.cases[i].on('case:imageMovedPx', function (i, x, y, width, height) {//Update du mouvement des cases de la couverture
+				/* TTFALT : AN IMAGE OF THE COVER MOVED OR WAS ZOOMED*/
+				this.cases[i].on('case:imageMovedPx', function (i, x, y, width, height) {
 					this.fire('layout:case:imageMovedPx', x, y, width,height, i, 0);
 				}.bind(this).curry(i))
 				
-				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {// Update des titres depuis la Case de type titre
+				/*TTFALT : A TITLE CASE WAS EDITED */
+				if ((this.type === "moods" && i === 5) || (this.type === "stories" && i === 3)) {
 					tempCase.on('case:titleChanged', function (title) {
 						this.fire('layout:updateTitle', title);
 						this.fire('layout:getTitle',title);
 					}.bind(this))
 				}
-				
 				this.el.appendChild(this.cases[i].div);
 			}
 
 
-			if(this.type === "moods"){//Elimination de la slide image en trop (à revoir, indispensable mais ne devrait pas être nécessaire )
+			if(this.type === "moods"){ 
 				this.slides.splice(5,1)
 			} else if (this.type === "stories") {
 				this.slides.splice(3,1)
-			};
+			};//gets rid of the unneeded slide (works fine but not that much elegant) 
 
-			this.curSlide = 0; //Slide en cours (initialisation sur la couverture aka slide 0)
+			this.curSlide = 0; //index of the current slide displayed
 
-			document.body.addEventListener("keydown", function (e) { // EVENEMENT DU DEROULEMENT DES SLIDES
+			document.body.addEventListener("keydown", function (e) { // event to naviguate through slides
 				if (e.keyCode === 37 && this.curSlide) {//LEFT ARROW
 					this.slides[this.curSlide].hide();
 					this.curSlide--;
@@ -295,7 +295,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}
 			}.bind(this))
 
-			/*Mise a jour du titre dans la couv et dans les slides*/
+			/*UPDATE TITLE ON BOTH COVER AND SLIDES*/
 			this.on('layout:updateTitle', function (title) {
 				if (this.type === 'moods') {
 					this.slides[0].cases[5].txtBloc.children[0].children[0].children[0].innerHTML = title
@@ -308,13 +308,12 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.title = title;
 			}.bind(this))
 
-			/*On rassemble le tout dans un bon gros div*/
+			/*MIX IT, SHAKE IT, MAKE A DIV*/
 			this.elt = document.createElement('div');
 			this.elt.appendChild(this.el)
 			for(var i = 1, n = this.slides.length; i < n; i++) {
 				this.elt.appendChild(this.slides[i].el);
 			}
-
 		}
 	})
 })

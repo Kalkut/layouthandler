@@ -69,7 +69,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				]
 			}, scp)
 
-			if(this.type === 'moods'){
+			if(this.type === 'moods') {
 
 				this.menu = new Selectbox({
 					choices : [
@@ -91,7 +91,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					if(!this.menu.opened){
 						this.menu.down();
 						this.menu.opened = true;
-					}else{
+					}else {
 						this.menu.up();
 						this.menu.opened = false;
 					}
@@ -218,8 +218,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 
 		},
 
-		addLine : function (e){
-			if(e.keyCode === 13 && this.nbLines < this.maxLines){
+		addLine : function (e,textBP){
+			if(e.keyCode === 13){
 				this.nbLines++;
 				this.index = Date.now();
 				var scope = {};
@@ -227,62 +227,74 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					tag : 'div.' + this.prefix + "-list-element",
 					style : {
 						width : 250,
-						height : 100,
 					},
 
 					children : [
 					{
 						tag : 'div.' + this.prefix + "-bulletPoint",
 						style : {
-									//backgroundImage : ,
-									backgroundColor : "#8c8fc2",
-									width : 15,
-									height : 15,
-									cssFloat : "left",
+							backgroundColor : "#8c8fc2",
+							width : 15,
+							height : 15,
+							cssFloat : "left",
+						}
+					},
+
+					{
+						tag : 'div.' + this.prefix + "-text",
+						style :{
+							width : 210,
+							cssFloat : "left",
+						},
+						innerHTML : textBP || "",
+						attr : {
+							contenteditable : true,
+							signature : this.signatures[this.nbLines-1] || this.index,
+						},
+						events : {
+							keydown : function (e) {
+
+								if(e.keyCode === 8 && this.nbLines > 1 && scope[this.prefix + '-text'].innerHTML === ""){
+									e.preventDefault();
+									this.nbLines--;
+									scope[this.prefix + "-list-element"].parentNode.removeChild(scope[this.prefix + "-list-element"]);
+									this.fire("slide:lineRemoved", scope[this.prefix + '-text'].attributes.signature.value,this.nbLines)
+								}else if (e.keyCode === 13) {
+									e.preventDefault()
 								}
-							},
-							
-							{
-								tag : 'div.' + this.prefix + "-text",
-								style :{
-									width : 210,
-									height : 100,
-									cssFloat : "left",
-								},
-								attr : {
-									contenteditable : true,
-									signature : this.signatures[this.nbLines-1] || this.index,
-								},
-								events : {
-									keydown : function (e) {
-										this.addLine(e);
-										if(e.keyCode === 8 && this.nbLines > 1 && scope[this.prefix + '-text'].innerHTML === ""){
-											e.preventDefault();
-											this.nbLines--;
-											console.log(this.nbLines);
-											scope[this.prefix + "-list-element"].parentNode.removeChild(scope[this.prefix + "-list-element"]);
-											this.fire("slide:lineRemoved", scope[this.prefix + '-text'].attributes.signature.value,this.nbLines)
-										}
-									}.bind(this),
+							}.bind(this),
 
-									keyup : function(e) {
-										e.preventDefault();
-										this.fire("slide:changedBP", scope[this.prefix + '-text'].attributes.signature.value, scope[this.prefix + '-text'].innerHTML)
-										//console.log(scope[this.prefix + '-text'].attributes.signature.value, scope[this.prefix + '-text'].innerHTML);
-									}.bind(this)
-								},
+							keyup : function(e) {
+								this.addLine(e);
+								for(var i = 0, n = this.bulletPoint.childNodes.length; i < n ; i++) {
+									this.fire('slide:changedBP',this.bulletPoint.childNodes[i].childNodes[1].innerHTML,i)
+								}
+							}.bind(this)
+						},
+					}]
+				}, scope );
+				this.bulletPoint.appendChild(this.nextItem);this.nextItem.children[1].focus();
+				this.fire('slide:lineAdded',this.nextItem.children[1].attributes.signature.value,this.nbLines);
+			}
+		},
 
-							}
-							]
-						}, scope);
+		load : function (bulletPoints,i) {
+			if(!jQuery.isEmptyObject(bulletPoints[i])){
+				for(var k in bulletPoints[i])	{
+					this.addLine({keyCode : 13},bulletPoints[i][k])		
+				}
+			} else {
+					this.addLine({keyCode : 13})
+			}
 
-this.nextItem.children[1].innerHTML = this.bulletPoints[this.nextItem.children[1].attributes.signature.value] || "";
-this.bulletPoint.appendChild(this.nextItem);
-this.nextItem.focus();
-this.fire('slide:lineAdded',this.nextItem.children[1].attributes.signature.value,this.nbLines);
-}
-}
 
-})
+		},
 
+		noBulletPoint : function () {
+			for( var i = 0, n = this.bulletPoint.childNodes.length; i < n; i++ ){
+					this.bulletPoint.removeChild(this.bulletPoint.childNodes[0]);
+				}
+		},
+
+	})
 })
