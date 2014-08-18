@@ -76,7 +76,10 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 			for (var iter = 0, len = options.labels.length; iter < len ; iter++){
 				this.choices.push({label : options.labels[iter], id : options.id[iter]})
-				if (options.id[iter] === this.type) this.typeIndex = iter;
+				if (options.id[iter] === this.type){
+					this.typeIndex = iter;
+					this.fire('layout:indexOfCurrentTypeFound', this.typeIndex)
+				} 
 			}
 			
 			this.menu = new Selectbox({
@@ -129,7 +132,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					logo : options.logo,
 					label : options.labels[this.typeIndex]
 				});
-			} else if (options.banners[this.typeIndex] === 'right') {
+			} else if (options.banners[this.typeIndex] === 'up') {
 				this.banner = new Banner({
 					side: "up",
 					prefix: (options.prefix || ""),
@@ -145,112 +148,37 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				var imgIndex;
 				var slidesIndex;
 
-				/*choix de la bannière*/
-			/*if (this.type === 'moods') {
-				this.positions = positions.moods
-				this.banner = new Banner({
-					side: "left",
-					prefix: (options.prefix || ""),
-					logo : options.logo
-				});
-			} else if (this.type = 'stories') {
-				this.positions = positions.stories;
-				this.banner = new Banner({
-					side: "up",
-					prefix: (options.prefix || ""),
-					logo : options.logo
-				});}*/
+
 				
+				var imgIndex = 0;
 				/*Initialisation des cases et des slides : VERY FAT LOOP*/
 				for (var i = 0, n = this.casesPositions[this.typeIndex].length; i < n; i++) {
 
-					/*if (this.type === 'moods') {
-
-					i < 5 ? slidesIndex = i+1 : slidesIndex = i; // slideIndex € [1,12]
-					i < 5 ? imgIndex = i : imgIndex = i-1;// imgInex € [0,11]
-					var tempCase = new Case({
-						width: this.positions[i][2],
-						height: this.positions[i][3],
-						type: i === 5 ? 'txt' : 'img',
-						imgSrc: options.imgSrcs[imgIndex],
-						prefix: (options.prefix || ""),
-						pos : (options.positions && options.positions.moods && options.positions.moods[0]) ? options.positions.moods[0][i] : null
-					})
-					var tempSlide = new Slide({
-						logo: options.logo,
-						type: "moods",
-						title: options.title || "",
-						prefix: options.prefix || "",
-						width: 1100,
-						height: 750,
-						comment : options.comments[i]||"",
-						box: {
-							prefix: options.prefix || "",
-							width: 773,
-							height: 591,
-							imgSrc: options.imgSrcs[imgIndex],
-							type: 'img',
-							fit : true,
-							pos : (options.positions && options.positions.moods && options.positions.moods[slidesIndex]) ? options.positions.moods[slidesIndex][0] : null
-						}
-					})
-				} else if (this.type === 'stories') {
-					i < 3 ? slidesIndex = i+1 : slidesIndex = i; // slideIndex € [1,5]
-					i < 3 ? imgIndex = i : imgIndex = i-1; // imgIndex € [0,4]
-					var tempCase = new Case({
-						width: this.positions[i][2],
-						height: this.positions[i][3],
-						type: i === 3 ? 'txt' : 'img',
-						imgSrc: options.imgSrcs[imgIndex],
-						prefix: (options.prefix || ""),
-						pos : (options.positions && options.positions.stories && options.positions.stories[0]) ? options.positions.stories[0][i] : null
-					})
-					var tempSlide = new Slide({
-						logo: options.logo,
-						type: "stories",
-						title: options.title || "",
-						prefix: options.prefix || "",
-						width: 1100,
-						height: 750,
-						bulletPoints : options.bulletPoints[i+1] || {},
-						box: {
-							prefix: options.prefix || "",
-							width: 637,
-							height: 597,
-							imgSrc: options.imgSrcs[imgIndex],
-							type: 'img',
-							fit : true,
-							pos : (options.positions && options.positions.stories && options.positions.stories[slidesIndex]) ? options.positions.stories[slidesIndex][0] : null
-						}
-					})
-
-					//TRANSFERT DATA ABOUT BULLET POINTS				
-					tempSlide.on("slide:changedBP", function (slideIndex,text,index) {
-						this.fire("layout:slide:changedBP", slideIndex, text, index);
-					}.bind(this).curry(slidesIndex))}*/
-					options.casesTypes[i] === "txt" ? slidesIndex = i+1 : slidesIndex = i; // slideIndex € [1,12]
-					options.casesTypes[i] === "txt" ? imgIndex = i : imgIndex = i-1;// imgInex € [0,11]
 					var box;
+					if (options.casesTypes[this.typeIndex][i] === "txt"){
+							imgIndex--;
+					}
+
 
 					if(this.slidesType[this.typeIndex] === "comment"){
 						box = {
 							prefix: options.prefix || "",
 							width: 773,
 							height: 591,
-							imgSrc: options.imgSrcs[i],
+							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
-							pos : (options.positions && options.positions[this.type] && options.positions[this.type][slidesIndex]) ? options.positions[this.type][slidesIndex][0] : null,
+							pos : (options.positions && options.positions[this.type] && options.positions[this.type][imgIndex + 1]) ? options.positions[this.type][imgIndex + 1][0] : null,
 						}
-					} else if (this.slidesType[this.typeIndex] === "bulletPoint") {
+					} else if (this.slidesType[this.typeIndex] === "bulletPoints") {
 						box = {
 							prefix: options.prefix || "",
 							width: 637,
 							height: 597,
-							imgSrc: options.imgSrcs[i],
+							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
-							pos : (options.positions && options.positions.stories && options.positions.stories[slidesIndex]) ? options.positions.stories[slidesIndex][0] : null
+							pos : (options.positions && options.positions.stories && options.positions.stories[imgIndex + 1]) ? options.positions.stories[imgIndex + 1][0] : null
 						}
 					}
 
@@ -258,7 +186,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						width: this.casesPositions[this.typeIndex][i][2],
 						height: this.casesPositions[this.typeIndex][i][3],
 						type: options.casesTypes[this.typeIndex][i],
-						imgSrc: options.imgSrcs[i],
+						imgSrc: options.imgSrcs[imgIndex],
 						prefix: (options.prefix || ""),
 						pos : (options.positions && options.positions[this.type] && options.positions[this.type][0]) ? options.positions[this.type][0][i] : null //position des cases de la couverture
 					})
@@ -283,6 +211,11 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					} 
 
 					this.cases.push(tempCase);
+
+					//TRANSFERT DATA ABOUT BULLET POINTS				
+					tempSlide.on("slide:changedBP", function (slideIndex,text,index) {
+						this.fire("layout:slide:changedBP", slideIndex, text, index);
+					}.bind(this).curry(slidesIndex))}
 
 					/*CASE to LAYOUT : IMAGE DATA, CURSOR OVERLAPPING A CASE */
 					for(var k = 0, l = tempSlide.cases.length; k < l; k++) {
@@ -332,12 +265,13 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}.bind(this).curry(i))
 				
 				/*TTFALT : A TITLE CASE WAS EDITED */
-				if (options.casesTypes[i] === "txt") {
+				if (i === this.titleIndex[this.typeIndex]) {
 					tempCase.on('case:titleChanged', function (title) {
 						this.fire('layout:updateTitle', title);
 						this.fire('layout:getTitle',title);
 					}.bind(this))
 				}
+				imgIndex++;
 				this.el.appendChild(this.cases[i].div);
 			}
 
@@ -364,13 +298,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 			/*UPDATE TITLE ON BOTH COVER AND SLIDES*/
 			this.on('layout:updateTitle', function (title) {
-				/*if (this.type === 'moods') {
-					this.slides[0].cases[5].txtBloc.children[0].children[0].children[0].innerHTML = title
-				} else if (this.type === 'stories') {
-					this.slides[0].cases[3].txtBloc.children[0].children[0].children[0].innerHTML = title
-				}*/
-
-				this.slides[0].cases[this.titleIndex].txtBloc.children[0].children[0].children[0].innerHTML = title
+				this.slides[0].cases[this.titleIndex[this.typeIndex]].txtBloc.children[0].children[0].children[0].innerHTML = title
 				for (var i = 1, n = this.slides.length; i < n; i++) {
 					this.slides[i].el.children[1].innerHTML = title;
 				}

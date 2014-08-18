@@ -30,15 +30,26 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				this.layout = this.create(Layout,this.data);
 			}
 
+			this.layout.on('layout:indexOfCurrentTypeFound', function (typeIndex) {
+				this.typeIndex = typeIndex;
+			})
+
 			/*SET COMMENTS (Could have been done in Slide Class*/
-				for (var indice in this.data.comments) {
+				/*for (var indice in this.data.comments) {
 					if(indice != 0 && this.data.type === "moods") {
+						this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
+					}
+				}*/
+
+				for (var indice in this.data.comments) {
+					if(indice != 0 && this.layout.slides[indice].type === "comment") {
 						this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
 					}
 				}
 
+
 				/*SET BULLET POINTS*/
-				if(this.layout.type === "stories") {
+				if(this.data.slidesType === "bulletPoints") {
 					for(var i = 1, n = this.layout.slides.length; i < n; i++){
 						this.layout.slides[i].load(this.data.bulletPoints,i);
 					}
@@ -75,19 +86,19 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 				/*UPDATE DATA ABOUT IMAGES ( POSITION AND SIZE ) */
 				this.layout.on('layout:case:imageMovedPx', function (x , y , width, height , i , k) {
-					if(this.layout.type === "moods") var key = k >= 5 ? k-1 : k;
-					else if(this.layout.type === "stories") var key = k >= 3 ? k-1 : k;
+					//if(this.layout.type === "moods") var key = k >= 5 ? k-1 : k;
+					//else if(this.layout.type === "stories") var key = k >= 3 ? k-1 : k;
 
 					if(this.data.positions[this.layout.type] || this.data.positions[this.layout.type] === {}) {
-						if(this.data.positions[this.layout.type][key] || this.data.positions[this.layout.type][key] === {}) {
-							this.data.positions[this.layout.type][key][i] = [x,y, width, height];
+						if(this.data.positions[this.layout.type][k] || this.data.positions[this.layout.type][k] === {}) {
+							this.data.positions[this.layout.type][k][i] = [x,y, width, height];
 						}else {
-							this.data.positions[this.layout.type][key] = {};
+							this.data.positions[this.layout.type][k] = {};
 						}
 					}else {
 						this.data.positions[this.layout.type] = {};
 					}
-					this.fire('layouts:layout:case:imageMovedPx',[x,y,width,height],key,i);
+					this.fire('layouts:layout:case:imageMovedPx',[x,y,width,height],k,i);
 				}.bind(this))
 
 				/*TRIGGER ON LINE ADDITION*/
@@ -165,16 +176,14 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 				/*TRIGGER ON D&D SUCCESS*/
 				this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { //& Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
+					
 					this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
-					if(this.data.type === "moods"){
-						(newIndex < 5) ? newIndex: newIndex--;
-						(oldIndex < 5) ? oldIndex : oldIndex--;
-					} else if(this.data.type === "stories"){
-						(newIndex < 3) ? newIndex : newIndex--;
-						(oldIndex < 3) ? oldIndex : oldIndex--;
-					}
+					
+					(newIndex < this.data.titleIndex[this.typeIndex]) ? newIndex: newIndex--;
+					(oldIndex < this.data.titleIndex[this.typeIndex]) ? oldIndex : oldIndex--;
 					this.data.imgSrcs[newIndex] = oldSrc;
 					this.data.imgSrcs[oldIndex] = newSrc;
+
 				}.bind(this))
 
 				/*UPDATING SLIDES AFTER A D&D*/

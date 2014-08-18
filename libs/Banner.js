@@ -68,7 +68,6 @@ sand.define('Banner',['Case'], function (r) {
 
 			this.div.style.position = "absolute";
 
-			console.log('banner')
 		}
 	})
 })

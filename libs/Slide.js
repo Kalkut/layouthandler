@@ -9,7 +9,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			this.box.div.id = "pic";
 			this.type = options.type;
 			var scp = {};
-			this.prefix = (options.prefix || "");
+			this.prefix = (this.prefix || "");
 			this.bulletPoints = options.bulletPoints;
 			this.signatures = options.signatures || {};
 
@@ -33,7 +33,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			})
 			
 			this.el = toDOM({
-				tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "slide",
+				tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "slide",
 				style : {
 					width : options.width,
 					height : options.height,
@@ -46,7 +46,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				,
 
 				{
-					tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "title",
+					tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "title",
 					style : {
 						width : 620,
 						height : 30,
@@ -61,7 +61,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					},
 					events : {
 						keyup : function () {
-							this.fire('slide:titleChanged',scp[(options.prefix ? (options.prefix + "-") : "") + "title"].innerHTML);
+							this.fire('slide:titleChanged',scp[(this.prefix ? (this.prefix + "-") : "") + "title"].innerHTML);
 						}.bind(this)
 					},
 					innerHTML : options.title || null,
@@ -127,7 +127,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				var box = this.box.div;
 
 				this.bloc = toDOM({
-					tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") +'bloc',
+					tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") +'bloc',
 					style : {
 						width : box.style.width,
 						height : box.style.width,
@@ -138,7 +138,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 
 					box,
 					{
-						tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "desc",
+						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "desc",
 
 						style : {
 							opacity : "0.7",
@@ -179,7 +179,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.el.children[1].style.color = "#f17f37";
 				this.el.appendChild(this.bloc)
 			}
-			else if (this.type === 'bulletPoint') {
+			else if (this.type === 'bulletPoints') {
 
 				/*this.menu = new Selectbox({
 					choices : options.choices,
@@ -216,7 +216,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				var boxWidth = parseInt(this.box.div.style.width);
 
 				this.bulletPoint = toDOM({
-					tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "list",
+					tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "list",
 					style : {
 						position : "absolute",
 						width : 321,
@@ -233,8 +233,6 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.el.appendChild(this.box.div);
 				this.el.appendChild(this.bulletPoint);
 			}
-
-			console.log('slide')
 		},
 
 		addLine : function (e,textBP){
@@ -243,14 +241,14 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.index = Date.now();
 				var scope = {};
 				this.nextItem = toDOM({
-					tag : 'div.' (this.prefix + "-" || "") + "list-element",
+					tag : 'div.' + (this.prefix + "-" || "") + "list-element",
 					style : {
 						width : 250,
 					},
 
 					children : [
 					{
-						tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "bulletPoint",
+						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "bulletPoint",
 						style : {
 							backgroundColor : "#8c8fc2",
 							width : 15,
@@ -260,7 +258,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					},
 
 					{
-						tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "text",
+						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "text",
 						style :{
 							width : 210,
 							cssFloat : "left",
@@ -277,7 +275,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 									e.preventDefault();
 									this.nbLines--;
 									scope[(this.prefix + "-" || "") + "list-element"].parentNode.removeChild(scope[(this.prefix + "-" || "") + "list-element"]);
-									this.fire("slide:lineRemoved", scope[(options.prefix ? (options.prefix + "-") : "") + "text"].attributes.signature.value,this.nbLines)
+									this.fire("slide:lineRemoved", scope[(this.prefix ? (this.prefix + "-") : "") + "text"].attributes.signature.value,this.nbLines)
 								}else if (e.keyCode === 13) {
 									e.preventDefault()
 								}
@@ -292,7 +290,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 						},
 					}]
 				}, scope );
-				this.bulletPoint.appendChild(this.nextItem);this.nextItem.children[1].focus();
+				this.bulletPoint.appendChild(this.nextItem);
+				this.nextItem.children[1].focus();
 				this.fire('slide:lineAdded',this.nextItem.children[1].attributes.signature.value,this.nbLines);
 			}
 		},
