@@ -1,10 +1,8 @@
-.berenger-case-idle,.berenger-case-selected{
+.case{
 	margin: 6px;
-}
-
-.berenger-case{
 	outline: none;
 }
+
 
 @font-face{
 	font-family: "clr";
@@ -21,42 +19,42 @@
 	src : url("/canalboldromain-webfont.woff");
 }
 
-.berenger-title,.berenger-desc{
+.title,.desc{
 	font-family: "clr";
 	font-weight: bold;
 }
 
-.berenger-text{
+.text{
 	font-family: "clr";
 	font-weight: bold;
 	color: #AAAAAA
 }
 
-td.berenger-case{
+td.case{
 	font-family: "cbr";
 	font-size:  : 20px;
 	color: #AAAAAA;
 }
 
-table.berenger-case{
+table.case{
 	text-align: center;
 	width: 100%;
 	height: 100%;
 }
 
-.berenger-title{
+.title{
 	font-size: 30px;
 	text-align: center;
 	vertical-align: middle;
 }
 
-.berenger-desc{
+.desc{
 	font-size: 18px;
 	color: #FFFFFF;
 	padding: 15px 25px 15px 15px;
 }
 
-.berenger-banner-txt{
+.banner-txt{
 	padding: 9px;
 	text-align: center;
 }
@@ -85,7 +83,7 @@ table.berenger-case{
 	background-color: #f17f37;
 }
 
-.berenger-bulletpoint{
+.bulletpoint{
 	margin-right: 22;
 }
 
@@ -97,10 +95,11 @@ table.berenger-case{
 	margin-right: auto;
 }
 
-.berenger-text{
+.text{
 	outline: none;
+	margin-bottom: 20px;
 }
 
-.berenger-text{
-	margin-bottom: 20px;
+.text{
+	
 }

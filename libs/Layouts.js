@@ -164,7 +164,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				}.bind(this))
 
 				/*TRIGGER ON D&D SUCCESS*/
-				this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { // Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
+				this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { //& Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
 					this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
 					if(this.data.type === "moods"){
 						(newIndex < 5) ? newIndex: newIndex--;
@@ -246,8 +246,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					this.layout.slides[oldIndex].cases[0].loadCase();
 
 				}.bind(this))
+				this.el = this.layout.elt;
+				this.fire('layouts:layoutCreated'); //create successful
 
-		this.fire('layouts:layoutCreated'); //create successful
 
 	},
 

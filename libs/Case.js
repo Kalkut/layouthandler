@@ -36,7 +36,7 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.staticPoint;
 			
 			this.div = toDOM({
-				tag : 'div.' + options.prefix + "-case-idle",
+				tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 				style : {
 					position : "absolute",
 					overflow : "hidden",
@@ -48,16 +48,16 @@ sand.define('Case',["Geo/*"], function (r) {
 
 			if(this.type === 'txt') {
 				this.txtBloc = toDOM({
-					tag : 'table.' + options.prefix + "-case",
+					tag : 'table.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 					children : [
 					{
-						tag : 'tr.' + options.prefix + "-case",
+						tag : 'tr.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 						children : [
 						{
-							tag : 'td.' + options.prefix + "-case",
+							tag : 'td.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 							children : [
 							{
-								tag : 'div.' + options.prefix + "-case",
+								tag : 'div.' + (options.prefix ? (options.prefix + "-") : "") + "case",
 								events : {
 									keyup : function () {
 										this.fire('case:titleChanged',this.txtBloc.children[0].children[0].children[0].innerHTML);
