@@ -111,7 +111,7 @@ sand.define('Case',["Geo/*"], function (r) {
 						var potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
 						var center = [parseInt(this.div.style.width)/2,parseInt(this.div.style.height)/2];
 
-						if ( !this.fit || (this.fit && (potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) ) {
+						if ((potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
 							this.zoom(factor);
 							this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]); //origine du referentiel du zoom = curseur
 							this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
