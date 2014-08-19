@@ -3,7 +3,6 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 	return Seed.extend({
 
 		'+init' : function (data) {
-			
 			this.data = jQuery.extend({},data);
 			this.data.comments = this.data.comments || {};
 			this.data.positions = this.data.positions || {};
@@ -34,27 +33,21 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				this.typeIndex = typeIndex;
 			})
 
-			/*SET COMMENTS (Could have been done in Slide Class*/
-				/*for (var indice in this.data.comments) {
-					if(indice != 0 && this.data.type === "moods") {
-						this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
-					}
-				}*/
-
 				for (var indice in this.data.comments) {
-					if(indice != 0 && this.layout.slides[indice].type === "comment") {
+					if(indice != 0 && this.data.slidesType[this.layout.typeIndex] === "comment") {
 						this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
 					}
 				}
 
 
 				/*SET BULLET POINTS*/
-				if(this.data.slidesType === "bulletPoints") {
+				if(this.data.slidesType[this.layout.typeIndex] === "bulletPoints") {
 					for(var i = 1, n = this.layout.slides.length; i < n; i++){
 						this.layout.slides[i].load(this.data.bulletPoints,i);
 					}
 				}
-				
+
+
 				/*GET THE TITLE*/
 				this.layout.on('layout:getTitle', function (title) {
 					this.title = title
@@ -86,8 +79,6 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 				/*UPDATE DATA ABOUT IMAGES ( POSITION AND SIZE ) */
 				this.layout.on('layout:case:imageMovedPx', function (x , y , width, height , i , k) {
-					//if(this.layout.type === "moods") var key = k >= 5 ? k-1 : k;
-					//else if(this.layout.type === "stories") var key = k >= 3 ? k-1 : k;
 
 					if(this.data.positions[this.layout.type] || this.data.positions[this.layout.type] === {}) {
 						if(this.data.positions[this.layout.type][k] || this.data.positions[this.layout.type][k] === {}) {
@@ -178,99 +169,77 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { //& Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
 					
 					this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
-					
-					(newIndex < this.data.titleIndex[this.typeIndex]) ? newIndex: newIndex--;
-					(oldIndex < this.data.titleIndex[this.typeIndex]) ? oldIndex : oldIndex--;
+					(newIndex < this.data.titleIndex[this.layout.typeIndex]) ? newIndex: newIndex--;
+					(oldIndex < this.data.titleIndex[this.layout.typeIndex]) ? oldIndex : oldIndex--;
 					this.data.imgSrcs[newIndex] = oldSrc;
 					this.data.imgSrcs[oldIndex] = newSrc;
-
 				}.bind(this))
+
 
 				/*UPDATING SLIDES AFTER A D&D*/
 				this.layout.on('layouts:slidesExchanged', function (newSrc,newIndex,oldSrc,oldIndex,type) {
-					if(type === "moods") {
+					for( var iter = 0, n = this.data.id.length; iter < n; iter++) {
+						var nIndex = newIndex;
+						var oIndex = oldIndex;
+						
+						nIndex < this.data.titleIndex[iter] ? nIndex++ : nIndex;// index € [0,1,2,4,5]
+						oIndex < this.data.titleIndex[iter] ? oIndex++ : oIndex;
 
-						/*UPDATE STORIES BULLETPOINTS*/
-						var newStoriesIndex = newIndex;
-						var oldStoriesIndex = oldIndex;
+						if(this.data.slidesType[iter] === "bulletPoints") {
 
-						newStoriesIndex < 3 ? newStoriesIndex++ : newStoriesIndex;// index € [0,1,2,4,5]
-						oldStoriesIndex < 3 ? oldStoriesIndex++ : oldStoriesIndex;
 						//now index € [1,2,3,4,5]
+						var oldBuffer = jQuery.extend({},this.data.bulletPoints[oIndex]);
+						var newBuffer = jQuery.extend({},this.data.bulletPoints[nIndex]);
 						
-						var oldStoriesBuffer = jQuery.extend({},this.data.bulletPoints[oldStoriesIndex]);
-						var newStoriesBuffer = jQuery.extend({},this.data.bulletPoints[newStoriesIndex]);
-						
-						this.data.bulletPoints[oldStoriesIndex] = newStoriesBuffer;
-						this.data.bulletPoints[newStoriesIndex] = oldStoriesBuffer;
+						this.data.bulletPoints[oIndex] = newBuffer;
+						this.data.bulletPoints[nIndex] = oldBuffer;
 
-						/* UPDATE MOODS COMMENTS*/
-						newIndex < 5 ? newIndex++ : newIndex;
-						oldIndex < 5 ? oldIndex++ : oldIndex;
+						if(this.data.slidesType[this.layout.typeIndex] === "bulletPoints"){
+							this.layout.slides[nIndex].noBulletPoint();
+							this.layout.slides[oIndex].noBulletPoint();
 
-						var oldBuffer = this.data.comments[oldIndex];
-						this.data.comments[oldIndex] = this.data.comments[newIndex];
-						this.data.comments[newIndex] = oldBuffer;
-						
-						this.layout.slides[oldIndex].bloc.children[1].innerHTML = this.data.comments[oldIndex] ? this.data.comments[oldIndex] : "";
-						this.layout.slides[newIndex].bloc.children[1].innerHTML = this.data.comments[newIndex] ? this.data.comments[newIndex] : "";
+							this.layout.slides[nIndex].load(this.data.bulletPoints,nIndex);
+							this.layout.slides[oIndex].load(this.data.bulletPoints,oIndex);
+						}
+					} else if (this.data.slidesType[iter] === "comment") {
+						 //UPDATE MOODS COMMENTS
 
+						 var oldBuffer = this.data.comments[oIndex];
+
+						 this.data.comments[oIndex] = this.data.comments[nIndex];
+						 this.data.comments[nIndex] = oldBuffer;
+
+						 if(this.data.slidesType[this.layout.typeIndex] === "comment") { 
+						 	this.layout.slides[nIndex].bloc.children[1].innerHTML = this.data.comments[nIndex] ? this.data.comments[nIndex] : "";
+						 	this.layout.slides[oIndex].bloc.children[1].innerHTML = this.data.comments[oIndex] ? this.data.comments[oIndex] : "";
+						 }
+						}
 					}
-					else if(type === "stories") {
+					
 
-						/* UPDATE MOODS COMMENTS*/
-						var newMoodsIndex = newIndex;
-						var oldMoodsIndex = oldIndex;
+					this.layout.slides[nIndex].cases[0].img.src = oldSrc;
+					this.layout.slides[oIndex].cases[0].img.src = newSrc;
 
-						newMoodsIndex < 5 ? newMoodsIndex++ : newMoodsIndex;
-						oldMoodsIndex < 5 ? oldMoodsIndex++ : oldMoodsIndex;
+					this.layout.slides[nIndex].cases[0].loadCase();
+					this.layout.slides[oIndex].cases[0].loadCase();
+				}.bind(this));
 
-						var oldMoodsBuffer = this.data.comments[oldMoodsIndex];
-						this.data.comments[oldMoodsIndex] = this.data.comments[newMoodsIndex];
-						this.data.comments[newMoodsIndex] = oldMoodsBuffer; 
-
-						/*UPDATE STRORIES BULLETPOINTS*/
-						newIndex < 3 ? newIndex++ : newIndex;// index € [0,1,2,4,5]
-						oldIndex < 3 ? oldIndex++ : oldIndex;
-						//now index € [1,2,3,4,5]
-						
-						var oldBuffer = jQuery.extend({},this.data.bulletPoints[oldIndex]);
-						var newBuffer = jQuery.extend({},this.data.bulletPoints[newIndex]);
-						
-						this.data.bulletPoints[oldIndex] = newBuffer;
-						this.data.bulletPoints[newIndex] = oldBuffer;
-
-						this.layout.slides[oldIndex].noBulletPoint();
-						this.layout.slides[newIndex].noBulletPoint();
-
-						this.layout.slides[oldIndex].load(this.data.bulletPoints,oldIndex);
-						this.layout.slides[newIndex].load(this.data.bulletPoints,newIndex);
-					}
-
-					/*UPDATING IMAGES*/
-					this.layout.slides[newIndex].cases[0].img.src = oldSrc;
-					this.layout.slides[oldIndex].cases[0].img.src = newSrc;
-
-					this.layout.slides[newIndex].cases[0].loadCase();
-					this.layout.slides[oldIndex].cases[0].loadCase();
-
-				}.bind(this))
 				this.el = this.layout.elt;
 				this.fire('layouts:layoutCreated'); //create successful
 
 
-	},
+			},
 
-	handleDrop : function (pos,src) {
-		for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
-			if( this.caseRectArray[i].contains(pos) ){
-				var oldSrc = this.layout.slides[0].cases[i].img.src;
-				this.layout.slides[0].cases[i].img.src = src;
-				this.layout.slides[0].cases[i].loadCase();
-				return [i,oldSrc];
+			handleDrop : function (pos,src) {
+				for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
+					if( this.caseRectArray[i].contains(pos) ){
+						var oldSrc = this.layout.slides[0].cases[i].img.src;
+						this.layout.slides[0].cases[i].img.src = src;
+						this.layout.slides[0].cases[i].loadCase();
+						return [i,oldSrc];
+					}
+				}
+				return false;
 			}
-		}
-		return false;
-	}
-})
+		})
 })

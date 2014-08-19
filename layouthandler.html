@@ -31,44 +31,32 @@
 	<script src="/prototypes.js"></script>
 	
 	<script type="text/javascript">
-
+	var data;
 	sand.require('Layouts',function (r) {
 		var Layouts = r.Layouts;
-		function getJSON (url){
-			var xmlhttp;
-			var data
-			xmlhttp = new XMLHttpRequest();
-			xmlhttp.open("GET",url,true);
-			xmlhttp.send();
-			xmlhttp.onreadystatechange = function () {
-				if (xmlhttp.readyState==4 && xmlhttp.status==200)
-				{   
-					data = JSON.parse(xmlhttp.responseText);
-				}
-			}
-			return data
-		}
 
 		var imgSrcs = ["/web.png","/pirate.png","/rocket.jpg","/zdp.jpg","/bp.jpg","/creative.jpg","/dessin.jpg","/egg.jpg","/future.png","/thinking.png","/w.jpg","/nasa.jpg","/process.png"]
 		var cases = [];
 
-		var data;
+		
 		var xmlhttp;
 		xmlhttp = new XMLHttpRequest();
-		xmlhttp.open("GET",'/CaseSettings.json',true);
+		xmlhttp.open("GET",'/settings.json',true);
 		xmlhttp.send();
 		xmlhttp.onreadystatechange = function () {
 			if (xmlhttp.readyState==4 && xmlhttp.status==200)
 			{   
 
 				data = JSON.parse(xmlhttp.responseText);
-
+				lay = new Layouts(data);
+				document.body.appendChild(lay.el);
 			}
 		}
 
-		lay = new Layouts({prefix : "berenger", imgSrcs : imgSrcs, margin : 10, type : "moods", logo : "Whibo.png" }); 
-		document.body.appendChild(lay.layout.elt)
+		//lay = new Layouts({/*prefix : "berenger",*/ imgSrcs : imgSrcs, margin : 10, type : "moods", logo : "Whibo.png" }); 
+		
+		
 	})
-</script>
+	</script>
 </body>
 </html>

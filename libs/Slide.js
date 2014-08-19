@@ -14,7 +14,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			this.signatures = options.signatures || {};
 
 			/*Case du Logo, indice 1 dans this.cases*/
-			this.logoBox =  new Case({ width : 87 , height : 47 , prefix : this.prefix, imgSrc : options.logo, type : "img", fit : true})
+			this.logoBox =  new Case({ width : 87 , height : 47 , prefix : this.prefix, imgSrc : options.logo, type : "img", fit : true,})
 			this.logoBox.div.id = "logo";
 			this.logoBox.div.style.left = 70;
 			this.logoBox.div.style.top = 8;
@@ -97,30 +97,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					}
 				}.bind(this);
 
+				this.menu.fake.className += " " + options.layoutType;
+				this.menu.trigger.className += " " +options.layoutType;
+
 			if(this.type === 'comment') {
-
-			/*	this.menu = new Selectbox({
-					choices : options.choices,
-					change : function(choice) {
-						this.fire('slide:changedLayout',choice.id)
-					}.bind(this),
-
-			def : 'moods' // l'identifiant de la valeur par défaut
-		})
-				this.menu.fake.className += " " + this.type;
-				this.menu.trigger.className += " " + this.type;
-				this.menu.up();
-				this.menu.opened = false
-				this.menu.trigger.onclick = function(e) {
-					e.preventDefault();
-					if(!this.menu.opened){
-						this.menu.down();
-						this.menu.opened = true;
-					}else {
-						this.menu.up();
-						this.menu.opened = false;
-					}
-				}.bind(this);*/
 
 				this.el.appendChild(this.menu.el)
 
@@ -180,33 +160,6 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.el.appendChild(this.bloc)
 			}
 			else if (this.type === 'bulletPoints') {
-
-				/*this.menu = new Selectbox({
-					choices : options.choices,
-					change : function(choice) {
-						this.fire('slide:changedLayout',choice.id);
-					}.bind(this),
-
-			def : 'stories' // l'identifiant de la valeur par défaut
-		})
-
-				this.menu.fake.className += " " + "stories";
-				this.menu.trigger.className += " " +" stories";
-				this.menu.up();
-				
-				this.el.appendChild(this.menu.el);
-
-				this.menu.opened = false
-				this.menu.trigger.onclick = function(e) {
-					e.preventDefault();
-					if(!this.menu.opened){
-						this.menu.down();
-						this.menu.opened = true;
-					}else{
-						this.menu.up();
-						this.menu.opened = false;
-					}
-				}.bind(this);*/
 
 				this.menu.el.style.top = 10;
 				this.menu.el.style.left = 881

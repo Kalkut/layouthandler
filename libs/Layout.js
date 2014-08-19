@@ -159,7 +159,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							imgIndex--;
 					}
 
-
+					var posObject = (options.positions && options.positions[options.id[this.typeIndex]] && options.positions[options.id[this.typeIndex]][imgIndex + 1]) ? options.positions[options.id[this.typeIndex]][imgIndex + 1][0] : null
 					if(this.slidesType[this.typeIndex] === "comment"){
 						box = {
 							prefix: options.prefix || "",
@@ -168,7 +168,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
-							pos : (options.positions && options.positions[this.type] && options.positions[this.type][imgIndex + 1]) ? options.positions[this.type][imgIndex + 1][0] : null,
+							pos : posObject,
 						}
 					} else if (this.slidesType[this.typeIndex] === "bulletPoints") {
 						box = {
@@ -178,7 +178,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 							imgSrc: options.imgSrcs[imgIndex],
 							type: 'img',
 							fit : true,
-							pos : (options.positions && options.positions.stories && options.positions.stories[imgIndex + 1]) ? options.positions.stories[imgIndex + 1][0] : null
+							pos : posObject,
 						}
 					}
 
@@ -213,9 +213,9 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					this.cases.push(tempCase);
 
 					//TRANSFERT DATA ABOUT BULLET POINTS				
-					tempSlide.on("slide:changedBP", function (slideIndex,text,index) {
-						this.fire("layout:slide:changedBP", slideIndex, text, index);
-					}.bind(this).curry(slidesIndex))}
+					tempSlide.on("slide:changedBP", function (imgIndex,text,index) {
+						this.fire("layout:slide:changedBP", imgIndex, text, index);
+					}.bind(this).curry(imgIndex+1))
 
 					/*CASE to LAYOUT : IMAGE DATA, CURSOR OVERLAPPING A CASE */
 					for(var k = 0, l = tempSlide.cases.length; k < l; k++) {

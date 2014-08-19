@@ -63,7 +63,7 @@ var serveur =  http.createServer(function (req,res) {
 	}
 	else if (req.url.split(".")[1] === 'json') {
 		res.writeHead(200,{"Content-Type": "text/json"})
-		res.write(fs.readFileSync("." + req.url.split(".")[0]  +".json"))
+		res.write(fs.readFileSync("settings" + req.url.split(".")[0]  +".json"))
 		res.end();
 	}	
 	else {
