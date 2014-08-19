@@ -1,6 +1,24 @@
 sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 	var Selectbox = r.Selectbox;
 	var Case = r.Case;
+
+	function placeCaretAtEnd(el) {
+    el.focus();
+    if (typeof window.getSelection != "undefined"
+            && typeof document.createRange != "undefined") {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    } else if (typeof document.body.createTextRange != "undefined") {
+        var textRange = document.body.createTextRange();
+        textRange.moveToElementText(el);
+        textRange.collapse(false);
+        textRange.select();
+    }
+}
 	
 	return Seed.extend({
 
@@ -224,10 +242,13 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 						events : {
 							keydown : function (e) {
 
-								if(e.keyCode === 8 && this.nbLines > 1 && scope[this.prefix + '-text'].innerHTML === ""){
+								if(e.keyCode === 8 && this.nbLines > 1 && scope[(this.prefix ? (this.prefix + "-") : "") + "text"].innerHTML === ""){
 									e.preventDefault();
 									this.nbLines--;
-									scope[(this.prefix + "-" || "") + "list-element"].parentNode.removeChild(scope[(this.prefix + "-" || "") + "list-element"]);
+									var daddy = scope[(this.prefix + "-" || "") + "list-element"].parentNode;
+									daddy.removeChild(scope[(this.prefix + "-" || "") + "list-element"]);
+									daddy.childNodes[daddy.childNodes.length-1].children[1].focus();
+									placeCaretAtEnd(daddy.childNodes[daddy.childNodes.length-1].children[1])
 									this.fire("slide:lineRemoved", scope[(this.prefix ? (this.prefix + "-") : "") + "text"].attributes.signature.value,this.nbLines)
 								}else if (e.keyCode === 13) {
 									e.preventDefault()

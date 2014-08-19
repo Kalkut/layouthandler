@@ -127,7 +127,7 @@ sand.define('Case',["Geo/*"], function (r) {
 					var deltaY = e.clientY- this.img.height/2 - this.posClick[1];
 					var delta = [deltaX,deltaY];
 					var potentialRect = this.imgRect.move({vector : delta});
-					if(this.clicking) {
+					if(this.clicking && !this.frozen) {
 						if (!this.fit && (potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height))) {
 							this.img.style.left = parseInt(this.img.style.left) + deltaX;
 							this.img.style.top = parseInt(this.img.style.top) + deltaY;
@@ -210,5 +210,12 @@ sand.define('Case',["Geo/*"], function (r) {
 
 		},
 
+		freeze : function () {
+			this.frozen = true;
+		},
+
+		unfreeze : function () {
+			this.frozen = false;
+		}
 	})
 })

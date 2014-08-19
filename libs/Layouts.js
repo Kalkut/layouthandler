@@ -122,13 +122,12 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				this.draggedDiv; // D&Droppable thumbnail (clone of the html structure of a Case)
 
 				/*D&D MOVEMENT*/
-				this.layout.slides[0].el.addEventListener('mousemove', function (e) {
-					this.cursorPosition = [e.clientX -this.layout.slides[0].el.offsetLeft,e.clientY - this.layout.slides[0].el.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]);
+				document.body.addEventListener('mousemove', function (e) {
+					this.cursorPosition = [e.pageX - $(this.layout.slides[0].el).offset().left, e.pageY - $(this.layout.slides[0].el).offset().top];
 					if(this.draggedDiv) {
-						if( this.cursorPosition[0] > 0 && this.cursorPosition[0] < (parseInt(this.layout.slides[0].el.style.width) -15) && 0 < this.cursorPosition[1] && (parseInt(this.layout.slides[0].el.style.height) - 15) > this.cursorPosition[1]){
-							this.draggedDiv.style.left = this.cursorPosition[0];
-							this.draggedDiv.style.top = this.cursorPosition[1];
-						} else {
+						this.draggedDiv.style.left = this.cursorPosition[0];
+						this.draggedDiv.style.top = this.cursorPosition[1];
+						if( !(this.cursorPosition[0] > 0 && this.cursorPosition[0] < (parseInt(this.layout.slides[0].el.style.width) -15) && 0 < this.cursorPosition[1] && (parseInt(this.layout.slides[0].el.style.height) - 15) > this.cursorPosition[1])){
 							this.fire('layouts:draggableImageOut',this.draggedDiv.childNodes[0].src, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
 						}
 					}
@@ -139,6 +138,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					if(e.shiftKey){
 						for(var i = 0, n = this.caseRectArray.length ; i < n; i++){
 							if( this.caseRectArray[i].contains(this.cursorPosition) ){
+								this.layout.slides[0].cases[i].freeze();
 								this.draggedDiv =  this.layout.slides[0].cases[i].div.cloneNode(true);
 								this.draggedDiv.style.left = this.cursorPosition[0];
 								this.draggedDiv.style.top = this.cursorPosition[1];
@@ -150,18 +150,19 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				}.bind(this))
 
 				/*D&D END*/
-				this.layout.slides[0].el.addEventListener('mouseup', function (e) {
+				document.body.addEventListener('mouseup', function (e) {
 					if(this.draggedDiv){
 						var oldSrc = this.layout.slides[0].cases[this.dragIndex].img.src;
 						var dropResult = this.handleDrop(this.cursorPosition,oldSrc);
 						if (dropResult) {
 							this.layout.slides[0].cases[this.dragIndex].img.src = dropResult[1];
 							this.layout.slides[0].cases[this.dragIndex].loadCase();
-							this.layout.fire('layout:dragSuccessful',dropResult[1], dropResult[0], oldSrc, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])	
+							this.layout.fire('layout:dragSuccessful',dropResult[1], dropResult[0], oldSrc, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
 						}
 						this.layout.slides[0].el.removeChild(this.draggedDiv);
 						this.draggedDiv = null;
 						this.dragIndex = null;
+						this.layout.slides[0].cases[this.dragIndex].unfreeze();
 					}
 				}.bind(this))
 
