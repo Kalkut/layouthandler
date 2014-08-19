@@ -160,9 +160,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 							this.layout.fire('layout:dragSuccessful',dropResult[1], dropResult[0], oldSrc, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
 						}
 						this.layout.slides[0].el.removeChild(this.draggedDiv);
+						this.layout.slides[0].cases[this.dragIndex].unfreeze();
 						this.draggedDiv = null;
 						this.dragIndex = null;
-						this.layout.slides[0].cases[this.dragIndex].unfreeze();
 					}
 				}.bind(this))
 

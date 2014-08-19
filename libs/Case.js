@@ -109,11 +109,18 @@ sand.define('Case',["Geo/*"], function (r) {
 						var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));// 1 : mousewheelup, 2 : mousewheeldown
 						var factor = delta > 0 ? 1.05 : 0.95;
 						var potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
+						var center = [parseInt(this.div.style.width)/2,parseInt(this.div.style.height)/2];
 
-						if ((!this.fit && (potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height))) || this.fit) {
+						if ( !this.fit || (this.fit && (potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) ) {
 							this.zoom(factor);
 							this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]); //origine du referentiel du zoom = curseur
 							this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
+							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
+							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
+						} else if (this.fit) {
+							this.imgRect.setCenter(center)
+							this.staticPoint = center
+							this.zoom(factor);
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 						}
@@ -128,14 +135,17 @@ sand.define('Case',["Geo/*"], function (r) {
 					var delta = [deltaX,deltaY];
 					var potentialRect = this.imgRect.move({vector : delta});
 					if(this.clicking && !this.frozen) {
-						if (!this.fit && (potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height))) {
+						if (/*!this.fit &&*/ (potentialRect.segX.c2 >= parseInt(this.div.style.width) && potentialRect.segX.c1 <= 0 && potentialRect.segY.c1 <= 0 && potentialRect.segY.c2 >= parseInt(this.div.style.height))) {
 							this.img.style.left = parseInt(this.img.style.left) + deltaX;
 							this.img.style.top = parseInt(this.img.style.top) + deltaY;
 							this.imgRect = potentialRect;
-						}else if(this.fit) {
-							this.img.style.left = Math.max(Math.min(parseInt(this.div.style.width),parseInt(this.img.style.left) + deltaX),-Math.min(parseInt(this.div.style.width)));
-							this.img.style.top = Math.max(Math.min(parseInt(this.div.style.height),parseInt(this.img.style.top) + deltaY),-Math.min(parseInt(this.div.style.height)));
-						}
+						}/*else if (this.fit) {
+							//this.img.style.left = Math.max(Math.min(parseInt(this.div.style.width),parseInt(this.img.style.left) + deltaX),-Math.min(parseInt(this.div.style.width)));
+							//this.img.style.top = Math.max(Math.min(parseInt(this.div.style.height),parseInt(this.img.style.top) + deltaY),-Math.min(parseInt(this.div.style.height)));
+							this.img.style.left = parseInt(this.img.style.left) + deltaX;
+							this.img.style.top = parseInt(this.img.style.top) + deltaY;
+							this.imgRect = potentialRect;
+						}*/
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
