@@ -93,11 +93,6 @@ sand.define('Case',["Geo/*"], function (r) {
 					this.clicking = false;
 				}.bind(this)
 
-				this.div.onmouseout = function () {
-					this.clicking = false;
-					this.cursorOver = false;
-				}.bind(this);
-
 				this.div.onmouseover = function () {
 					this.cursorOver = true;
 				}.bind(this)
