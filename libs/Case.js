@@ -25,8 +25,8 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.img = new Image();
 			if(options.imgSrc) this.img.src = options.imgSrc;
 			this.img.style.position = "absolute";
-			this.img.style.left = 0;
-			this.img.style.top = 0;
+			this.img.style.left = 0 +'px';
+			this.img.style.top = 0 + 'px';
 			this.type = options.type;
 			this.fit = options.fit // Mode libre, pas de restriction sur le mouvement ou sur le zoom de l'image
 			this.pos = options.pos;
@@ -137,8 +137,8 @@ sand.define('Case',["Geo/*"], function (r) {
 					this.potentialRect = this.imgRect.move({vector : delta});
 					if(this.clicking && !this.frozen) {
 						if (/*!this.fit &&*/ (this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height))) {
-							this.img.style.left = parseInt(this.img.style.left) + deltaX;
-							this.img.style.top = parseInt(this.img.style.top) + deltaY;
+							this.img.style.left = (parseInt(this.img.style.left) + deltaX) + 'px';
+							this.img.style.top = parseInt(this.img.style.top) + deltaY + 'px';
 							this.imgRect = this.potentialRect;
 						}/*else if (this.fit) {
 							//this.img.style.left = Math.max(Math.min(parseInt(this.div.style.width),parseInt(this.img.style.left) + deltaX),-Math.min(parseInt(this.div.style.width)));
@@ -166,10 +166,10 @@ sand.define('Case',["Geo/*"], function (r) {
 				this.imgRect = this.imgRect.forcedIn(new r.Geo.Rect({ p1 : [parseInt(this.img.style.left),parseInt(this.img.style.top)], p2 : [parseInt(this.div.style.width),parseInt(this.div.style.height)]}))
 			}
 
-			this.img.style.width = this.imgRect.segX.getLength();
-			this.img.style.height = this.imgRect.segY.getLength();
-			this.img.style.left =  this.imgRect.segX.c1;
-			this.img.style.top = this.imgRect.segY.c1;
+			this.img.style.width = this.imgRect.segX.getLength() + 'px';
+			this.img.style.height = this.imgRect.segY.getLength() + 'px';
+			this.img.style.left =  this.imgRect.segX.c1 + 'px';
+			this.img.style.top = this.imgRect.segY.c1 + 'px';
 		},
 
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image
@@ -177,15 +177,15 @@ sand.define('Case',["Geo/*"], function (r) {
 
 				if(this.pos){
 					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
-					this.img.style.width = this.pos[2];
-					this.img.style.height = this.pos[3];
-					this.img.style.left = this.pos[0];
-					this.img.style.top = this.pos[1];
+					this.img.style.width = this.pos[2] + 'px';
+					this.img.style.height = this.pos[3] + 'px';
+					this.img.style.left = this.pos[0] + 'px';
+					this.img.style.top = this.pos[1] + 'px';
 				} else {
-					this.img.style.height = this.img.naturalHeight;
-					this.img.style.width = this.img.naturalWidth;
-					this.img.style.left = 0;
-					this.img.style.top = 0;
+					this.img.style.height = this.img.naturalHeight + 'px';
+					this.img.style.width = this.img.naturalWidth + 'px';
+					this.img.style.left = 0 + 'px';
+					this.img.style.top = 0 + 'px';
 					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
 
 					var height = parseInt(this.div.style.height);
@@ -194,12 +194,12 @@ sand.define('Case',["Geo/*"], function (r) {
 					var ratioDiv = height/width;
 
 					if (this.ratio > ratioDiv) {
-						this.img.style.width = width;
-						this.img.style.height = width*this.ratio;
+						this.img.style.width = width  + 'px';
+						this.img.style.height = width*this.ratio + 'px';
 					}
 					else {
-						this.img.style.height = height;
-						this.img.style.width = height/this.ratio;
+						this.img.style.height = height + 'px';
+						this.img.style.width = height/this.ratio + 'px';
 					}
 
 				}

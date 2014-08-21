@@ -19,7 +19,7 @@
 	src : url("/canalboldromain-webfont.woff");
 }
 
-.title,.desc{
+.title,.comment{
 	font-family: "clr";
 	font-weight: bold;
 }
@@ -46,12 +46,27 @@ table.case{
 	font-size: 30px;
 	text-align: center;
 	vertical-align: middle;
+	width : 620px;
+	height : 30px;
+	left : 190px;
+	top : 21px;
+	position : absolute;
+	text-align : center;
+	outline : none;
 }
 
-.desc{
+
+.comment{
 	font-size: 18px;
 	color: #FFFFFF;
 	padding: 15px 25px 15px 15px;
+	opacity : 0.7;
+	background-color : #000000;
+	width : 380px;
+	height : 50px;
+	position : absolute;
+	z-index : 1;
+	outline: none;
 }
 
 .banner-txt{
@@ -61,10 +76,10 @@ table.case{
 
 .trigger-label,.item,.select-box,.fake{
 	font-family : "cbi";
-	font-size : 16;
+	font-size : 16px;
 	color: #FFFFFF;
-	width : 115;
-	height : 40;
+	width : 115px;
+	height : 40px;
 	text-align: center;
 	vertical-align: middle;
 	z-index: 1;
@@ -72,7 +87,7 @@ table.case{
 
 .select-box{
 	position : absolute;
-	left: 900;
+	left: 900px;
 }
 
 .stories{
@@ -84,7 +99,7 @@ table.case{
 }
 
 .bulletpoint{
-	margin-right: 22;
+	margin-right: 22px;
 }
 
 .picto-moods,.picto-stories{
@@ -98,8 +113,4 @@ table.case{
 .text{
 	outline: none;
 	margin-bottom: 20px;
-}
-
-.text{
-	
 }

@@ -34,8 +34,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			/*Case du Logo, indice 1 dans this.cases*/
 			this.logoBox =  new Case({ width : 87 , height : 47 , prefix : this.prefix, imgSrc : options.logo, type : "img", fit : true,})
 			this.logoBox.div.id = "logo";
-			this.logoBox.div.style.left = 70;
-			this.logoBox.div.style.top = 8;
+			this.logoBox.div.style.left = 70 + 'px';
+			this.logoBox.div.style.top = 8 + 'px';
 
 
 			this.cases = [this.box,this.logoBox];
@@ -65,15 +65,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 
 				{
 					tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "title",
-					style : {
-						width : 620,
-						height : 30,
-						left : 190	,
-						top : 21,
-						position : "absolute",
-						textAlign : "center",
-						outline : "none"
-					},
+
 					attr : {
 						contenteditable : true
 					},
@@ -97,8 +89,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			def : options.layoutType // l'identifiant de la valeur par défaut
 		})
 
-				this.menu.fake.className += " " + this.type;
-				this.menu.trigger.className += " " + this.type;
+				this.menu.fake.className += " " + options.layoutType;
+				this.menu.trigger.className += " " + options.layoutType;
 				this.menu.up();
 				
 				this.el.appendChild(this.menu.el);
@@ -136,16 +128,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 
 					box,
 					{
-						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "desc",
-
-						style : {
-							opacity : "0.7",
-							backgroundColor : "#000000",
-							width : 380,
-							height : 50,
-							position : "absolute",
-							zIndex : 1
-						},
+						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "comment",
 
 						attr : {
 							contenteditable : true
@@ -161,39 +144,39 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					]
 				})
 
-				this.bloc.style.top = 87;
-				this.bloc.style.left = 160;
-				this.menu.el.style.top = 18;
-				this.menu.el.style.left = 960;
-				this.el.children[1].style.left = 240;
+				this.bloc.style.top = 87 + 'px';
+				this.bloc.style.left = 160 + 'px';
+				this.menu.el.style.top = 18 + 'px';
+				this.menu.el.style.left = 960 + 'px';
+				this.el.children[1].style.left = 240 + 'px';
 
 
 
 				this.box.on('case:imageMovedInt',function (x,y,iWidth,iHeight) {
-					this.bloc.children[1].style.left = Math.min(Math.max(x - 50,-50),parseInt(this.box.div.style.width));
-					this.bloc.children[1].style.top =  Math.max(Math.min(y + iHeight - 50,parseInt(this.box.div.style.height)-50), - 50);
+					this.bloc.children[1].style.left = Math.min(Math.max(x - 50,-50),parseInt(this.box.div.style.width)) + 'px';
+					this.bloc.children[1].style.top =  Math.max(Math.min(y + iHeight - 50,parseInt(this.box.div.style.height)-50), - 50) + 'px';
 				}.bind(this));
 
-				this.el.children[1].style.color = "#f17f37";
+				this.el.children[1].style.color = options.color || "#f17f37";
 				this.el.appendChild(this.bloc)
 			}
 			else if (this.type === 'bulletPoints') {
 
-				this.menu.el.style.top = 10;
-				this.menu.el.style.left = 881
-				this.box.div.style.left  = 63;
-				this.box.div.style.top = 110;
-				this.el.children[1].style.color = "#8c8fc2";
+				this.menu.el.style.top = 10 + 'px';
+				this.menu.el.style.left = 881 + 'px';
+				this.box.div.style.left  = 63 + 'px';
+				this.box.div.style.top = 110 + 'px';
+				this.el.children[1].style.color = options.color || "#8c8fc2";
 				var boxWidth = parseInt(this.box.div.style.width);
 
 				this.bulletPoint = toDOM({
 					tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "list",
 					style : {
 						position : "absolute",
-						width : 321,
-						height : 600,
-						top : 130,
-						left : 743,
+						width : 321 + 'px',
+						height : 600 + 'px',
+						top : 130 + 'px',
+						left : 743 + 'px',
 					}
 				})
 
@@ -204,6 +187,11 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.el.appendChild(this.box.div);
 				this.el.appendChild(this.bulletPoint);
 			}
+
+
+			this.on("slide:newColor", function (color) {
+				this.setColor(color);
+			}.bind(this))
 		},
 
 		addLine : function (e,textBP){
@@ -214,7 +202,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 				this.nextItem = toDOM({
 					tag : 'div.' + (this.prefix + "-" || "") + "list-element",
 					style : {
-						width : 250,
+						width : 250 + 'px',
 					},
 
 					children : [
@@ -222,8 +210,8 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "bulletPoint",
 						style : {
 							backgroundColor : "#8c8fc2",
-							width : 15,
-							height : 15,
+							width : 15 + 'px',
+							height : 15 + 'px',
 							cssFloat : "left",
 						}
 					},
@@ -231,7 +219,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 					{
 						tag : 'div.' + (this.prefix ? (this.prefix + "-") : "") + "text",
 						style :{
-							width : 210,
+							width : 210 + 'px',
 							cssFloat : "left",
 						},
 						innerHTML : textBP || "",
@@ -286,6 +274,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			for( var i = 0, n = this.bulletPoint.childNodes.length; i < n; i++ ){
 					this.bulletPoint.removeChild(this.bulletPoint.childNodes[0]);
 				}
+		},
+
+		setColor : function (color) {
+			this.el.children[1].style.color = color;
 		},
 
 	})

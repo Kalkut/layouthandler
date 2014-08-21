@@ -125,8 +125,8 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				document.body.addEventListener('mousemove', function (e) {
 					this.cursorPosition = [e.pageX - $(this.layout.slides[0].el).offset().left, e.pageY - $(this.layout.slides[0].el).offset().top];
 					if(this.draggedDiv) {
-						this.draggedDiv.style.left = this.cursorPosition[0];
-						this.draggedDiv.style.top = this.cursorPosition[1];
+						this.draggedDiv.style.left = this.cursorPosition[0] + 'px';
+						this.draggedDiv.style.top = this.cursorPosition[1] + 'px';
 						if( !(this.cursorPosition[0] > 0 && this.cursorPosition[0] < (parseInt(this.layout.slides[0].el.style.width) -15) && 0 < this.cursorPosition[1] && (parseInt(this.layout.slides[0].el.style.height) - 15) > this.cursorPosition[1])){
 							this.fire('layouts:draggableImageOut',this.draggedDiv.childNodes[0].src, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
 						}
@@ -140,8 +140,8 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 							if( this.caseRectArray[i].contains(this.cursorPosition) ){
 								this.layout.slides[0].cases[i].freeze();
 								this.draggedDiv =  this.layout.slides[0].cases[i].div.cloneNode(true);
-								this.draggedDiv.style.left = this.cursorPosition[0];
-								this.draggedDiv.style.top = this.cursorPosition[1];
+								this.draggedDiv.style.left = this.cursorPosition[0] + 'px';
+								this.draggedDiv.style.top = this.cursorPosition[1] + 'px';
 								this.layout.slides[0].el.appendChild(this.draggedDiv);
 								this.dragIndex = i;
 							}
@@ -228,6 +228,14 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				this.el = this.layout.elt;
 				this.fire('layouts:layoutCreated'); //create successful
 
+				document.body.addEventListener("keydown", function (e) { // event to naviguate through slides
+				if (e.keyCode === 37) {//LEFT ARROW
+					this.previous();
+				} else if (e.keyCode === 39) {//RIGHT ARROW
+					this.next();
+				}
+			}.bind(this))
+
 
 			},
 
@@ -241,6 +249,23 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					}
 				}
 				return false;
+			},
+
+			setColor : function (color) {
+				this.data.color = color;
+				this.layout.banner.fire("banner:newColor",color);
+				for(var i = 0, n = this.layout.slides.length; i < n; i++) {
+					this.layout.slides[i].fire("slide:newColor",color);
+				}
+			},
+
+			next : function () {
+				this.layout.fire("layout:nextSlide");
+			},
+
+			previous : function () {
+				this.layout.fire("layout:previousSlide")
 			}
+			
 		})
 })

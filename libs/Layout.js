@@ -99,8 +99,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			this.menu.trigger.appendChild(icon);
 			this.menu.trigger.className += " picto-" + this.type
 
-			this.menu["select-box"].style.left = 10;
-			this.menu["select-box"].style.zIndex = 1;
+			this.menu["select-box"].style.left = 10 + 'px';
+			this.menu["select-box"].style.zIndex = 1 + 'px';
 			this.menu.fake.className += " " + this.type;
 			this.menu["trigger-picto"].parentNode.removeChild(this.menu["trigger-picto"]);
 			this.menu["trigger-label"].parentNode.removeChild(this.menu["trigger-label"]);
@@ -121,8 +121,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 			this.el = toDOM({
 				tag: "div." + (options.prefix ? (options.prefix + "-") : "") + "layout",
 				style: {
-					width: 1090, //Taille en dur, pour respecter les proportions naturelles du layout
-					height: 760,
+					width: 1090 + 'px', //Taille en dur, pour respecter les proportions naturelles du layout
+					height: 760 + 'px',
 					position: "absolute"
 				}
 			})
@@ -132,19 +132,21 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					side: "left",
 					prefix: (options.prefix || ""),
 					logo : options.logo,
-					label : options.layouts[this.layoutIndex].label
+					label : options.layouts[this.layoutIndex].label,
+					color : options.color || null,
 				});
 			} else if (options.layouts[this.layoutIndex].banner === 'up') {
 				this.banner = new Banner({
 					side: "up",
 					prefix: (options.prefix || ""),
 					logo : options.logo,
-					label : options.layouts[this.layoutIndex].label
+					label : options.layouts[this.layoutIndex].label,
+					color : options.color || null,
 				});
 			}
 				this.el.appendChild(this.banner.div);
-				this.menu.el.style.left = -10;
-				this.menu.el.style.top = 15;
+				this.menu.el.style.left = -10 + 'px';
+				this.menu.el.style.top = 15 + 'px';
 				this.banner.band.appendChild(this.menu.el);
 				this.slides.push(this);
 				var imgIndex;
@@ -203,6 +205,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						bulletPoints : options.bulletPoints[i+1] || {},
 						choices : this.choices,
 						layoutType : this.type,
+						color : options.color || null,
 						box: box
 					})
 
@@ -258,8 +261,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						this.fire('layout:getTitle', title);
 					}.bind(this))
 
-				this.cases[i].div.style.left = this.casesPositions[i][0];// positionement des CASES du layout
-				this.cases[i].div.style.top = this.casesPositions[i][1];
+				this.cases[i].div.style.left = this.casesPositions[i][0] + 'px';// positionement des CASES du layout
+				this.cases[i].div.style.top = this.casesPositions[i][1] + 'px';
 				
 				/* TTFALT : AN IMAGE OF THE COVER MOVED OR WAS ZOOMED*/
 				this.cases[i].on('case:imageMovedPx', function (i, x, y, width, height) {
@@ -286,17 +289,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 			this.curSlide = 0; //index of the current slide displayed
 
-			document.body.addEventListener("keydown", function (e) { // event to naviguate through slides
-				if (e.keyCode === 37 && this.curSlide) {//LEFT ARROW
-					this.slides[this.curSlide].hide();
-					this.curSlide--;
-					this.slides[this.curSlide].show();
-				} else if (e.keyCode === 39 && this.curSlide < this.slides.length - 1) {//RIGHT ARROW
-					this.slides[this.curSlide].hide();
-					this.curSlide++;
-					this.slides[this.curSlide].show();
-				}
-			}.bind(this))
+
 
 			/*UPDATE TITLE ON BOTH COVER AND SLIDES*/
 			this.on('layout:updateTitle', function (title) {
@@ -314,6 +307,31 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				this.elt.appendChild(this.slides[i].el);
 			}
 
+			this.on("layout:nextSlide", function () {
+				this.next();
+			}.bind(this))
+
+			this.on("layout:previousSlide", function () {
+				this.previous();
+			}.bind(this))
+
 	},
+
+	next : function () {
+		if(this.curSlide < this.slides.length - 1){
+			this.slides[this.curSlide].hide();
+			this.curSlide++;
+			this.slides[this.curSlide].show();
+		}
+	},
+
+	previous : function () {
+		if(this.curSlide){
+			this.slides[this.curSlide].hide();
+			this.curSlide--;
+			this.slides[this.curSlide].show();
+		}
+	}
+
 })
 })
