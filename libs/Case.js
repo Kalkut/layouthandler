@@ -88,14 +88,11 @@ sand.define('Case',["Geo/*"], function (r) {
 					e.preventDefault();
 					this.clicking = true;
 				}.bind(this)
-				this.div.onmouseup = function (e) {
-					e.preventDefault();
+				
+				document.body.addEventListener("mouseup", function (e) {
 					this.clicking = false;
-				}.bind(this)
+				}.bind(this))
 
-				this.div.onmouseover = function () {
-					this.cursorOver = true;
-				}.bind(this)
 
 				this.div.addEventListener('mousewheel', function (e) {
 					if(e.shiftKey){
@@ -148,6 +145,8 @@ sand.define('Case',["Geo/*"], function (r) {
 					this.posClick[0] = e.clientX - this.img.width/2;
 					this.posClick[1] = e.clientY- this.img.height/2;
 				}.bind(this)
+
+				document.body.addEventListener("mousemove", this.div.onmousemove )
 
 				this.loadCase(true);
 				
