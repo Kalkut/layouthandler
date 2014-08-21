@@ -110,17 +110,17 @@ sand.define('Case',["Geo/*"], function (r) {
 						var factor = delta > 0 ? 1.05 : 0.95;
 						this.potentialRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});// Merci Geo
 						this.imgCenter = [parseInt(this.div.style.width)/2,parseInt(this.div.style.height)/2];
-
-						if( ( this.potentialRect.segX.length() >= parseInt(this.div.style.width) ) && ( this.potentialRect.segY.length() >= parseInt(this.div.style.height) ) ) {
+						this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]); //origine du referentiel du zoom = curseur
+						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
+						
+						if( (!this.fit && (( this.potentialRect.segX.length() >= parseInt(this.div.style.width) ) && ( this.potentialRect.segY.length() >= parseInt(this.div.style.height) ) ) ) ) {
 						//if ((this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
 							this.zoom(factor);
-							this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]); //origine du referentiel du zoom = curseur
-							this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 						} else if (this.fit) {
 							this.imgRect.setCenter(this.imgCenter)
-							this.staticPoint = this.imgCenter
+							if( ( this.potentialRect.segX.length() <= parseInt(this.div.style.width) ) || ( this.potentialRect.segY.length() <= parseInt(this.div.style.height) ) ) this.staticPoint = this.imgCenter;
 							this.zoom(factor);
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
@@ -160,15 +160,16 @@ sand.define('Case',["Geo/*"], function (r) {
 		},
 
 		zoom : function (factor) {// Merci Geo !
+			this.imgRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});
+			
 			if ( !(this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
-				this.imgRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor}).forcedIn(new r.Geo.Rect({ p1 : [0,0], p2 : [parseInt(this.div.style.width),parseInt(this.div.style.height)]}))
-			} else {
-				this.imgRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});
+				this.imgRect = this.imgRect.forcedIn(new r.Geo.Rect({ p1 : [parseInt(this.img.style.left),parseInt(this.img.style.top)], p2 : [parseInt(this.div.style.width),parseInt(this.div.style.height)]}))
 			}
-			this.img.style.left =  this.imgRect.segX.c1;
-			this.img.style.top = this.imgRect.segY.c1;
+
 			this.img.style.width = this.imgRect.segX.getLength();
 			this.img.style.height = this.imgRect.segY.getLength();
+			this.img.style.left =  this.imgRect.segX.c1;
+			this.img.style.top = this.imgRect.segY.c1;
 		},
 
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image

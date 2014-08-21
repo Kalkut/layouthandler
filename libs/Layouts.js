@@ -10,14 +10,14 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 
 
-			this.toLayout(this.data.type);
+			this.toLayout(this.data.defaultLayout);
 			this.title;
 
 		},
 
 		toLayout : function (type) {
 			
-			this.data.type = type;
+			this.data.defaultLayout = type;
 
 			if(this.layout){
 				var daddy = this.layout.elt.parentNode;
@@ -34,16 +34,16 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			})
 
 				for (var indice in this.data.comments) {
-					if(indice != 0 && this.data.slidesType[this.layout.typeIndex] === "comment") {
+					if(indice != 0 && this.data.layouts[this.layout.layoutIndex].slides === "comment") {
 						this.layout.slides[indice].bloc.children[1].innerHTML = this.data.comments[indice]||null;
 					}
 				}
 
 
 				/*SET BULLET POINTS*/
-				if(this.data.slidesType[this.layout.typeIndex] === "bulletPoints") {
+				if(this.data.layouts[this.layout.layoutIndex].slides === "bulletPoints") {
 					for(var i = 1, n = this.layout.slides.length; i < n; i++){
-						this.layout.slides[i].load(this.data.bulletPoints,i);
+						this.layout.slides[i].load(this.data.slides[i-1].bulletPoints);
 					}
 				}
 
@@ -62,18 +62,18 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 				/*UPDATE DATA ABOUT BULLETPOINTS*/
 				this.layout.on("layout:slide:changedBP", function (slideIndex,text,index) {
-					if(this.data.bulletPoints[slideIndex] || this.data.bulletPoints[slideIndex] === {}){
-						this.data.bulletPoints[slideIndex][index] = text;
+					if(this.data.slides[slideIndex-1].bulletPoints || this.data.slides[slideIndex-1].bulletPoints === {}){
+						this.data.slides[slideIndex-1].bulletPoints[index] = text;
 					} else {
-						this.data.bulletPoints[slideIndex] = {};
+						this.data.slides[slideIndex-1].bulletPoints = {};
 					}
 					this.fire("layouts:layout:slide:changedBP");
 				}.bind(this))
 
 				/*UPDATE DATA ABOUT COMMENTS*/
 				this.layout.on('layout:slide:changedComment', function (i , comment) {
-					var ind = i >= 5 ? i-1 : i;
-					this.data.comments[ind] = comment;
+					var ind = i >= 5 ? i-2 : i-1;
+					this.data.slides[ind].comment = comment;
 					this.fire('layouts:layout:slide:changedComment', ind , comment);
 				}.bind(this))
 
@@ -169,50 +169,50 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 				/*TRIGGER ON D&D SUCCESS*/
 				this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { //& Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
 					
-					this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.type);
-					(newIndex < this.data.titleIndex[this.layout.typeIndex]) ? newIndex: newIndex--;
-					(oldIndex < this.data.titleIndex[this.layout.typeIndex]) ? oldIndex : oldIndex--;
-					this.data.imgSrcs[newIndex] = oldSrc;
-					this.data.imgSrcs[oldIndex] = newSrc;
+					this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.defaultLayout);
+					(newIndex < this.data.layouts[this.layout.layoutIndex].titleIndex) ? newIndex : newIndex--;
+					(oldIndex < this.data.layouts[this.layout.layoutIndex].titleIndex) ? oldIndex : oldIndex--;
+					this.data.slides[newIndex].img = oldSrc;
+					this.data.slides[oldIndex].img = newSrc;
 				}.bind(this))
 
 
 				/*UPDATING SLIDES AFTER A D&D*/
 				this.layout.on('layouts:slidesExchanged', function (newSrc,newIndex,oldSrc,oldIndex,type) {
-					for( var iter = 0, n = this.data.id.length; iter < n; iter++) {
+					for( var iter = 0, n = this.data.layouts.length; iter < n; iter++) {
 						var nIndex = newIndex;
 						var oIndex = oldIndex;
 						
-						nIndex < this.data.titleIndex[iter] ? nIndex++ : nIndex;// index € [0,1,2,4,5]
-						oIndex < this.data.titleIndex[iter] ? oIndex++ : oIndex;
+						nIndex < this.data.layouts[iter].titleIndex ? nIndex++ : nIndex;// index € [0,1,2,4,5]
+						oIndex < this.data.layouts[iter].titleIndex ? oIndex++ : oIndex;
 
-						if(this.data.slidesType[iter] === "bulletPoints") {
+						if(this.data.layouts[iter].slides === "bulletPoints") {
 
 						//now index € [1,2,3,4,5]
-						var oldBuffer = jQuery.extend({},this.data.bulletPoints[oIndex]);
-						var newBuffer = jQuery.extend({},this.data.bulletPoints[nIndex]);
+						var oldBuffer = jQuery.extend({},this.data.slides[oIndex-1].bulletPoints);
+						var newBuffer = jQuery.extend({},this.data.slides[nIndex-1].bulletPoints);
 						
-						this.data.bulletPoints[oIndex] = newBuffer;
-						this.data.bulletPoints[nIndex] = oldBuffer;
+						this.data.slides[oIndex-1].bulletPoints = newBuffer;
+						this.data.slides[nIndex-1].bulletPoints = oldBuffer;
 
-						if(this.data.slidesType[this.layout.typeIndex] === "bulletPoints"){
+						if(this.data.layouts[this.layout.layoutIndex].slides === "bulletPoints"){
 							this.layout.slides[nIndex].noBulletPoint();
 							this.layout.slides[oIndex].noBulletPoint();
 
-							this.layout.slides[nIndex].load(this.data.bulletPoints,nIndex);
-							this.layout.slides[oIndex].load(this.data.bulletPoints,oIndex);
+							this.layout.slides[nIndex].load(this.data.slides[nIndex-1].bulletPoints);
+							this.layout.slides[oIndex].load(this.data.slides[oIndex-1].bulletPoints);
 						}
-					} else if (this.data.slidesType[iter] === "comment") {
+					} else if (this.data.layouts[iter].slides === "comment") {
 						 //UPDATE MOODS COMMENTS
 
-						 var oldBuffer = this.data.comments[oIndex];
+						 var oldBuffer = this.data.slides[oIndex-1].comment;
 
-						 this.data.comments[oIndex] = this.data.comments[nIndex];
-						 this.data.comments[nIndex] = oldBuffer;
+						 this.data.slides[oIndex-1].comment = this.data.slides[nIndex-1].comment;
+						 this.data.slides[nIndex-1].comment = oldBuffer;
 
-						 if(this.data.slidesType[this.layout.typeIndex] === "comment") { 
-						 	this.layout.slides[nIndex].bloc.children[1].innerHTML = this.data.comments[nIndex] ? this.data.comments[nIndex] : "";
-						 	this.layout.slides[oIndex].bloc.children[1].innerHTML = this.data.comments[oIndex] ? this.data.comments[oIndex] : "";
+						 if(this.data.layouts[this.layout.layoutIndex].slides === "comment") { 
+						 	this.layout.slides[nIndex].bloc.children[1].innerHTML = this.data.slides[nIndex-1].comment ? this.data.slides[nIndex-1].comment : "";
+						 	this.layout.slides[oIndex].bloc.children[1].innerHTML = this.data.slides[oIndex-1].comment ? this.data.slides[oIndex-1].comment : "";
 						 }
 						}
 					}

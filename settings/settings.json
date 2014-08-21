@@ -1,32 +1,52 @@
 {
-  "id" : ["moods","stories"],
-  "labels" : ["MOODS","STORIES"],
-  "slidesType" : ["comment","bulletPoints"],
-  "banners" : ["left","up"],
-  "titleIndex" : [5,3],
-  "type" : "moods",
-  "casesTypes" : [["img","img","img","img","img","txt","img","img","img","img","img","img","img"],["img","img","img","txt","img","img"]],
-  "imgSrcs" : ["/web.png","/pirate.png","/rocket.jpg","/zdp.jpg","/bp.jpg","/creative.jpg","/dessin.jpg","/egg.jpg","/future.png","/thinking.png","/w.jpg","/nasa.jpg"],
+  "slides" : [ { "img" : "/web.png"},{ "img" :"/pirate.png"},{ "img" :"/rocket.jpg"},{ "img" :"/zdp.jpg"},{ "img" :"/bp.jpg"},{ "img" :"/creative.jpg"},{ "img" :"/dessin.jpg"},{ "img" :"/egg.jpg"},{ "img" :"/future.png"},{ "img" :"/thinking.png"},{ "img" :"/w.jpg"},{ "img" :"/nasa.jpg"}],
   "logo" : "Whibo.png",
-  "casesPositions" : [
-  [[120, 10, 225, 340],
-  [356, 10, 230, 290],
-  [598, 10, 230, 250],
-  [840, 10, 230, 215],
-  [120, 361, 224, 194],
-  [356, 310, 230, 245],
-  [598, 271, 230, 284],
-  [840, 235, 230, 320],
-  [120, 566, 118, 175],
-  [250, 566, 137, 175],
-  [399, 566, 135, 175],
-  [546, 566, 150, 175],
-  [708, 566, 362, 175]],
-  [[30, 120, 338, 295],
-  [378, 120, 338, 295],
-  [726, 120, 338, 295],
-  [30, 425, 338, 295],
-  [378, 425, 338, 295],
-  [726, 425, 338, 295]]
-  ]
+  "defaultLayout" : "moods",
+  "layouts" : [
+  {
+    "id" : "moods",
+    "cases" : ["img","img","img","img","img","txt","img","img","img","img","img","img","img"],
+    "slides" : "comment",
+    "titleIndex" : 5,
+    "label" : "MOODS",
+    "banner" : "left"
+  },
+  {
+    "id" : "stories",
+    "cases" : ["img","img","img","txt","img","img"],
+    "slides" : "bulletPoints",
+    "titleIndex" : 3,
+    "label" : "STORIES",
+    "banner" : "up"
+  }
+  ],
+  "configs" : { 
+    "moods" : {
+      "positions" : [
+        [120, 10, 225, 340],
+        [356, 10, 230, 290],
+        [598, 10, 230, 250],
+        [840, 10, 230, 215],
+        [120, 361, 224, 194],
+        [356, 310, 230, 245],
+        [598, 271, 230, 284],
+        [840, 235, 230, 320],
+        [120, 566, 118, 175],
+        [250, 566, 137, 175],
+        [399, 566, 135, 175],
+        [546, 566, 150, 175],
+        [708, 566, 362, 175]
+      ]
+    },
+    "stories" : {
+      "positions" : [
+      [30, 120, 338, 295],
+      [378, 120, 338, 295],
+      [726, 120, 338, 295],
+      [30, 425, 338, 295],
+      [378, 425, 338, 295],
+      [726, 425, 338, 295]
+      ]
+    }
+  }
 }

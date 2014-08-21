@@ -64,23 +64,25 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 		'+init': function (options) {
 			this.cases = []
-			this.type = options.type;
-			this.typeIndex;
-			this.casesType = options.casesTypes;
-			this.positions = options.positions || null;
-			this.casesPositions = options.casesPositions;
-			this.slides = [];
+			this.type = options.defaultLayout;
 			this.choices = [];
-			this.titleIndex = options.titleIndex;
-			this.slidesType = options.slidesType
 
-			for (var iter = 0, len = options.labels.length; iter < len ; iter++){
-				this.choices.push({label : options.labels[iter], id : options.id[iter]})
-				if (options.id[iter] === this.type){
-					this.typeIndex = iter;
-					this.fire('layout:indexOfCurrentTypeFound', this.typeIndex)
+			for (var iter = 0, len = options.layouts.length; iter < len ; iter++){
+				this.choices.push({label : options.layouts[iter].label, id : options.layouts[iter].id})
+				if (options.layouts[iter].id === this.type){
+					this.layoutIndex = iter;
+					this.fire('layout:indexOfCurrentTypeFound', this.layoutIndex)
 				} 
 			}
+
+			this.casesType = options.casesTypes;
+			this.positions = options.positions || null;
+			this.casesPositions = options.configs[this.type].positions;
+			this.slides = [];
+			this.titleIndex = options.layouts[this.layoutIndex].titleIndex;
+			this.slidesType = options.layouts[this.layoutIndex].slides
+
+			
 			
 			this.menu = new Selectbox({
 				choices : this.choices,
@@ -125,19 +127,19 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}
 			})
 
-			if (options.banners[this.typeIndex] === 'left') {
+			if (options.layouts[this.layoutIndex].banner === 'left') {
 				this.banner = new Banner({
 					side: "left",
 					prefix: (options.prefix || ""),
 					logo : options.logo,
-					label : options.labels[this.typeIndex]
+					label : options.layouts[this.layoutIndex].label
 				});
-			} else if (options.banners[this.typeIndex] === 'up') {
+			} else if (options.layouts[this.layoutIndex].banner === 'up') {
 				this.banner = new Banner({
 					side: "up",
 					prefix: (options.prefix || ""),
 					logo : options.logo,
-					label : options.labels[this.typeIndex]
+					label : options.layouts[this.layoutIndex].label
 				});
 			}
 				this.el.appendChild(this.banner.div);
@@ -152,30 +154,30 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				
 				var imgIndex = 0;
 				/*Initialisation des cases et des slides : VERY FAT LOOP*/
-				for (var i = 0, n = this.casesPositions[this.typeIndex].length; i < n; i++) {
+				for (var i = 0, n = this.casesPositions.length; i < n; i++) {
 
 					var box;
-					if (options.casesTypes[this.typeIndex][i] === "txt"){
+					if (options.layouts[this.layoutIndex].cases[i] === "txt"){
 							imgIndex--;
 					}
 
-					var posObject = (options.positions && options.positions[options.id[this.typeIndex]] && options.positions[options.id[this.typeIndex]][imgIndex + 1]) ? options.positions[options.id[this.typeIndex]][imgIndex + 1][0] : null
-					if(this.slidesType[this.typeIndex] === "comment"){
+					var posObject = (options.positions && options.positions[this.type] && options.positions[this.type][imgIndex + 1]) ? options.positions[this.type][imgIndex + 1][0] : null
+					if(options.layouts[this.layoutIndex].slides === "comment"){
 						box = {
 							prefix: options.prefix || "",
 							width: 773,
 							height: 591,
-							imgSrc: options.imgSrcs[imgIndex],
+							imgSrc: options.slides[imgIndex].img,
 							type: 'img',
 							fit : true,
 							pos : posObject,
 						}
-					} else if (this.slidesType[this.typeIndex] === "bulletPoints") {
+					} else if (options.layouts[this.layoutIndex].slides === "bulletPoints") {
 						box = {
 							prefix: options.prefix || "",
 							width: 637,
 							height: 597,
-							imgSrc: options.imgSrcs[imgIndex],
+							imgSrc: options.slides[imgIndex].img,
 							type: 'img',
 							fit : true,
 							pos : posObject,
@@ -183,24 +185,24 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 					}
 
 					var tempCase = new Case({	
-						width: this.casesPositions[this.typeIndex][i][2],
-						height: this.casesPositions[this.typeIndex][i][3],
-						type: options.casesTypes[this.typeIndex][i],
-						imgSrc: options.imgSrcs[imgIndex],
+						width: this.casesPositions[i][2],
+						height: this.casesPositions[i][3],
+						type: options.layouts[this.layoutIndex].cases[i],
+						imgSrc: options.slides[imgIndex].img,
 						prefix: (options.prefix || ""),
 						pos : (options.positions && options.positions[this.type] && options.positions[this.type][0]) ? options.positions[this.type][0][i] : null //position des cases de la couverture
 					})
 					var tempSlide = new Slide({
 						logo: options.logo,
-						type: this.slidesType[this.typeIndex],
+						type: options.layouts[this.layoutIndex].slides,
 						title: options.title || "",
 						prefix: options.prefix || "",
 						width: 1100,
 						height: 750,
-						comment : options.comments[i]||"",
+						comment : options.slides[imgIndex].comment ||"",
 						bulletPoints : options.bulletPoints[i+1] || {},
 						choices : this.choices,
-						layoutType : options.id[this.typeIndex],
+						layoutType : this.type,
 						box: box
 					})
 
@@ -256,8 +258,8 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						this.fire('layout:getTitle', title);
 					}.bind(this))
 
-				this.cases[i].div.style.left = this.casesPositions[this.typeIndex][i][0];// positionement des CASES du layout
-				this.cases[i].div.style.top = this.casesPositions[this.typeIndex][i][1];
+				this.cases[i].div.style.left = this.casesPositions[i][0];// positionement des CASES du layout
+				this.cases[i].div.style.top = this.casesPositions[i][1];
 				
 				/* TTFALT : AN IMAGE OF THE COVER MOVED OR WAS ZOOMED*/
 				this.cases[i].on('case:imageMovedPx', function (i, x, y, width, height) {
@@ -265,7 +267,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 				}.bind(this).curry(i))
 				
 				/*TTFALT : A TITLE CASE WAS EDITED */
-				if (i === this.titleIndex[this.typeIndex]) {
+				if (i === this.titleIndex) {
 					tempCase.on('case:titleChanged', function (title) {
 						this.fire('layout:updateTitle', title);
 						this.fire('layout:getTitle',title);
@@ -298,7 +300,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 			/*UPDATE TITLE ON BOTH COVER AND SLIDES*/
 			this.on('layout:updateTitle', function (title) {
-				this.slides[0].cases[this.titleIndex[this.typeIndex]].txtBloc.children[0].children[0].children[0].innerHTML = title
+				this.slides[0].cases[this.titleIndex].txtBloc.children[0].children[0].children[0].innerHTML = title
 				for (var i = 1, n = this.slides.length; i < n; i++) {
 					this.slides[i].el.children[1].innerHTML = title;
 				}

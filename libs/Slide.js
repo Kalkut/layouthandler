@@ -270,10 +270,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			}
 		},
 
-		load : function (bulletPoints,i) {
-			if(!jQuery.isEmptyObject(bulletPoints[i])){
-				for(var k in bulletPoints[i])	{
-					this.addLine({keyCode : 13},bulletPoints[i][k])		
+		load : function (bulletPoints) {
+			if(!jQuery.isEmptyObject(bulletPoints)){
+				for(var k in bulletPoints)	{
+					this.addLine({keyCode : 13},bulletPoints[k])		
 				}
 			} else {
 					this.addLine({keyCode : 13})
