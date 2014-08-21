@@ -1,5 +1,8 @@
-sand.define('Banner',['Case'], function (r) {
+sand.define('Banner',['Case', 'Seed', 'DOM/toDOM'], function (r) {
+	var Seed = r.Seed;
 	var Case = r.Case;
+	var toDOM = r.toDOM;
+	
 	return Seed.extend({
 		'+init' : function (options) {
 			this.side = options.side;
@@ -78,4 +81,4 @@ sand.define('Banner',['Case'], function (r) {
 			this.band.style.backgroundColor = color;
 		}
 	})
-})
+});

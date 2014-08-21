@@ -1,5 +1,7 @@
-sand.define('Layouts',['Layout','Geo/*'], function (r) {
+sand.define('Layouts',['Layout','Geo/*', 'Seed', 'DOM/toDOM'], function (r) {
 	var Layout = r.Layout;
+	var Seed = r.Seed;
+	var toDOM = r.toDOM;
 	return Seed.extend({
 
 		'+init' : function (data) {
@@ -7,8 +9,6 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.data.comments = this.data.comments || {};
 			this.data.positions = this.data.positions || {};
 			this.data.bulletPoints = this.data.bulletPoints || {};
-
-
 
 			this.toLayout(this.data.defaultLayout);
 			this.title;
@@ -268,4 +268,4 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			}
 			
 		})
-})
+});

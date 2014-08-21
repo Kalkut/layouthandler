@@ -1,5 +1,7 @@
-(function(name) {
-
+sand.define('Seed', [
+  'DOM/toDOM'
+], function(r) {
+  
   var extend = function(o, p) {
     for (var i in p) {
       o[i] = p[i];
@@ -13,7 +15,7 @@
     return r;
   };
 
-  var Seed = window[name] = function() {
+  var Seed = function() {
     this.init.apply(this, arguments);
   };
 
@@ -34,14 +36,14 @@
         this.mediator = this;
       }
 
-      if (o) {
-        if (o.mediator) this.mediator = o.mediator;
+      if (o) {
+        if (o.mediator && !this.isMediator) this.mediator = o.mediator;
         if (o.super) this.super = o.super;
       }
 
       this.$setOptions(o || {});
       if (this.tpl) {
-        this.el = toDOM(typeof(this.tpl) === 'function' ? this.tpl() : this.tpl, this);
+        this.el = r.toDOM(typeof(this.tpl) === 'function' ? this.tpl() : this.tpl, this);
         if (o && o.parentEl) o.parentEl.appendChild(this.el);
       }
     },
@@ -92,9 +94,8 @@
             self.$unbind(event, f);
           }
         };
-
         observers.push(observer);
-        scope && scope.$observers.push(observer);
+        scope && scope.$observers && scope.$observers.push(observer);
       }
 
       return {
@@ -161,7 +162,7 @@
 
   var pm = function(C, obj) {
     for (var i in obj) {
-      if (i[0] === '+' || i[0] === '-') {
+      if (i[0] === '+' || i[0] === '-') {
         (function() {
           var pmMethod = C.prototype[i], method = C.prototype[i.slice(1, i.length)], before, after;
           if (i[0] === '+') {
@@ -180,7 +181,7 @@
               return after.apply(this, arguments);
             };
           }
-          else if (typeof(before) === 'function' || typeof(after) === 'function') {
+          else if (typeof(before) === 'function' || typeof(after) === 'function') {
             //throw 'Should not happen';
           }
           else {
@@ -210,4 +211,6 @@
     return C;
   };
 
-})('Seed');
+  return Seed;
+
+});

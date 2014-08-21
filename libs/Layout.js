@@ -1,17 +1,11 @@
-sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function (r) {
+sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox', 'Seed', 'DOM/toDOM', 'core/Function/curry'], function (r) {
 	
+	var Seed = r.Seed;
 	var Slide = r.Slide;
 	var Banner = r.Banner;
 	var Case = r.Case;
 	var Selectbox = r.Selectbox;
-
-	Function.prototype.curry = function () {
-		var self = this;
-		var args = Array.prototype.slice.call(arguments);
-		return function () {
-			return self.apply([], args.concat(Array.prototype.slice.call(arguments)));
-		};
-	}
+	var toDOM = r.toDOM;
 
 	var onimagesload = function (imgs,callback) {
 		var l = imgs.length;

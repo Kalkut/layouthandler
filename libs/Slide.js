@@ -1,6 +1,9 @@
-sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
+sand.define('Slide',['Case','ressources/Selectbox', 'Seed', 'DOM/toDOM'], function (r) {
 	var Selectbox = r.Selectbox;
 	var Case = r.Case;
+
+	var Seed = r.Seed;
+	var toDOM = r.toDOM;
 
 	function placeCaretAtEnd(el) {
     el.focus();
@@ -281,4 +284,4 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 		},
 
 	})
-})
+});

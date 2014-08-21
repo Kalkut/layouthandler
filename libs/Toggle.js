@@ -1,5 +1,7 @@
-sand.define('ressources/Toggle', function() {
+sand.define('ressources/Toggle', ['Seed'], function(r) {
     
+  var Seed = r.Seed;
+
   return Seed.extend({
     
     onClick : function() {

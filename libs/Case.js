@@ -1,17 +1,22 @@
-sand.define('Case',["Geo/*"], function (r) {
+sand.define('Case',["Geo/*", 'Seed', 'DOM/toDOM'], function (r) {
 	
+	var Seed = r.Seed;
+	var toDOM = r.toDOM;
+
 	var onimagesload = function (imgs,callback) {
 		var l = imgs.length;
 		var c = 0;
 		for (var i = 0; i < l; i++){
-			if(imgs[i].loaded) c++;
+			if(imgs[i].loaded || imgs[i].complete) c++;
 			else imgs[i].onload = function () {
 				c++;
 				if (c === l) callback();
 			}
 		}
 
-		if (c === l) callback();
+		if (c === l) setTimeout(function() {
+			callback();
+		}, 1);
 	}
 
 	return Seed.extend({
@@ -40,8 +45,8 @@ sand.define('Case',["Geo/*"], function (r) {
 				style : {
 					position : "absolute",
 					overflow : "hidden",
-					width : options.width,
-					height : options.height,
+					width : options.width + 'px',
+					height : options.height + 'px',
 					outline : "none",
 				}
 			})
@@ -228,4 +233,4 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.frozen = false;
 		}
 	})
-})
+});
