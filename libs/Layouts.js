@@ -156,7 +156,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 						var dropResult = this.handleDrop(this.cursorPosition,oldSrc);
 						if (dropResult) {
 							this.layout.slides[0].cases[this.dragIndex].img.src = dropResult[1];
-							this.layout.slides[0].cases[this.dragIndex].loadCase();
+							
 							this.layout.fire('layout:dragSuccessful',dropResult[1], dropResult[0], oldSrc, this.dragIndex, this.cursorPosition[0], this.cursorPosition[1])
 						}
 						this.layout.slides[0].el.removeChild(this.draggedDiv);
@@ -168,7 +168,10 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 				/*TRIGGER ON D&D SUCCESS*/
 				this.layout.on('layout:dragSuccessful', function (newSrc,newIndex,oldSrc,oldIndex) { //& Mauvaise indexation, code à simplifier (travailler directement sur le imgSrc
-					
+					if(newIndex !== oldIndex) {
+						this.layout.slides[0].cases[newIndex].loadCase();
+						this.layout.slides[0].cases[oldIndex].loadCase();
+					}
 					this.layout.fire('layouts:slidesExchanged',newSrc,newIndex,oldSrc,oldIndex , this.data.defaultLayout);
 					(newIndex < this.data.layouts[this.layout.layoutIndex].titleIndex) ? newIndex : newIndex--;
 					(oldIndex < this.data.layouts[this.layout.layoutIndex].titleIndex) ? oldIndex : oldIndex--;
@@ -244,7 +247,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					if( this.caseRectArray[i].contains(pos) ){
 						var oldSrc = this.layout.slides[0].cases[i].img.src;
 						this.layout.slides[0].cases[i].img.src = src;
-						this.layout.slides[0].cases[i].loadCase();
+						//this.layout.slides[0].cases[i].loadCase();
 						return [i,oldSrc];
 					}
 				}
@@ -254,6 +257,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			setColor : function (color) {
 				this.data.color = color;
 				this.layout.banner.fire("banner:newColor",color);
+				this.layout.slides[0].cases[this.data.layouts[this.layout.layoutIndex].titleIndex].fire('case:setColor', color);
 				for(var i = 0, n = this.layout.slides.length; i < n; i++) {
 					this.layout.slides[i].fire("slide:newColor",color);
 				}

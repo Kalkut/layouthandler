@@ -33,7 +33,6 @@
 td.case{
 	font-family: "cbr";
 	font-size:  : 20px;
-	color: #AAAAAA;
 }
 
 table.case{
@@ -113,4 +112,9 @@ table.case{
 .text{
 	outline: none;
 	margin-bottom: 20px;
+}
+
+.layout-app{
+	width : 1110px;
+	height: 770px;
 }

@@ -192,6 +192,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 						type: options.layouts[this.layoutIndex].cases[i],
 						imgSrc: options.slides[imgIndex].img,
 						prefix: (options.prefix || ""),
+						color : options.color || null,
 						pos : (options.positions && options.positions[this.type] && options.positions[this.type][0]) ? options.positions[this.type][0][i] : null //position des cases de la couverture
 					})
 					var tempSlide = new Slide({
@@ -302,6 +303,7 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 
 			/*MIX IT, SHAKE IT, MAKE A DIV*/
 			this.elt = document.createElement('div');
+			this.elt.className = "layout-app";
 			this.elt.appendChild(this.el)
 			for(var i = 1, n = this.slides.length; i < n; i++) {
 				this.elt.appendChild(this.slides[i].el);

@@ -74,7 +74,9 @@ sand.define('Case',["Geo/*"], function (r) {
 									keyup : function () {
 										this.fire('case:titleChanged',this.txtBloc.children[0].children[0].children[0].innerHTML);
 									}.bind(this),
-
+								},
+								style : {
+									color : options.color || "#AAAAAA",
 								},
 								attr : {
 									contenteditable : true,
@@ -86,7 +88,16 @@ sand.define('Case',["Geo/*"], function (r) {
 					}],
 				})
 
+				this.div.onmousedown = function (e) {
+					e.preventDefault();
+					this.txtBloc.children[0].children[0].children[0].focus();
+				}.bind(this)
+
 				this.div.appendChild(this.txtBloc);
+
+				this.on('case:setColor', function (color) {
+					this.setColor(color);
+				}.bind(this));
 
 			} else if (this.type === 'img') {
 				
@@ -245,6 +256,10 @@ sand.define('Case',["Geo/*"], function (r) {
 
 		unfreeze : function () {
 			this.frozen = false;
+		},
+
+		setColor : function(color) {
+			this.txtBloc.children[0].children[0].children[0].style.color = color;
 		}
 	})
 })
