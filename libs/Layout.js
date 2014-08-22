@@ -13,21 +13,6 @@ sand.define('Layout',['Slide','Banner','Case','ressources/Selectbox'], function 
 		};
 	}
 
-	var onimagesload = function (imgs,callback) {
-		var l = imgs.length;
-		var c = 0;
-		for (var i = 0; i < l; i++){
-			if(imgs[i].loaded) c++;
-			else imgs[i].onload = function () {
-				c++;
-				if (c === l) callback();
-			}
-		}
-
-		if (c === l) callback();
-	}	
-
-
 	/*var positions = {
 		moods: [
 		[120, 10, 225, 340],

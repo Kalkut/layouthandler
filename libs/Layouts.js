@@ -8,10 +8,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 			this.data.positions = this.data.positions || {};
 			this.data.bulletPoints = this.data.bulletPoints || {};
 
-
-
+			this.title = data.title || "";
 			this.toLayout(this.data.defaultLayout);
-			this.title;
+			
 
 		},
 
@@ -230,7 +229,7 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 				this.el = this.layout.elt;
 				this.fire('layouts:layoutCreated'); //create successful
-
+				if(this.data.listenKeyboard){
 				document.body.addEventListener("keydown", function (e) { // event to naviguate through slides
 				if (e.keyCode === 37) {//LEFT ARROW
 					this.previous();
@@ -238,6 +237,9 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 					this.next();
 				}
 			}.bind(this))
+				}
+
+			this.setTitle(this.title || "");
 
 
 			},
@@ -269,6 +271,12 @@ sand.define('Layouts',['Layout','Geo/*'], function (r) {
 
 			previous : function () {
 				this.layout.fire("layout:previousSlide")
+			},
+
+			setTitle : function (title) {
+				this.layout.fire('layout:updateTitle',title);
+				this.layout.fire('layouts:titleUpdated',title);
+				this.layout.fire('layout:getTitle', title);
 			}
 			
 		})

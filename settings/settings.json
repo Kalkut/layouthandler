@@ -1,4 +1,6 @@
 {
+  "title" : "Who's your daddy now ?",
+  "listenKeyboard" : true, 
   "slides" : [ { "img" : "/web.png"},{ "img" :"/pirate.png"},{ "img" :"/rocket.jpg"},{ "img" :"/zdp.jpg"},{ "img" :"/bp.jpg"},{ "img" :"/creative.jpg"},{ "img" :"/dessin.jpg"},{ "img" :"/egg.jpg"},{ "img" :"/future.png"},{ "img" :"/thinking.png"},{ "img" :"/w.jpg"},{ "img" :"/nasa.jpg"}],
   "logo" : "Whibo.png",
   "defaultLayout" : "moods",
