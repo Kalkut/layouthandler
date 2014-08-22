@@ -23,7 +23,7 @@ sand.define('Banner',['Case'], function (r) {
 				this.txt.style.fontSize = 50 + 'px';
 				//this.txt.innerHTML = "M</br>O</br>O</br>D</br>S";
 				this.txt.innerHTML = "";
-				for(var i = 0, n = options.label.length; i < n; i++){
+				for(var i = 0, n = options.label.length; i < n; i++) {
 					this.txt.innerHTML += (options.label[i] + "</br>");
 				}
 				this.txt.style.top = 320 + 'px';

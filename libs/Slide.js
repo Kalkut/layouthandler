@@ -3,22 +3,21 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 	var Case = r.Case;
 
 	function placeCaretAtEnd(el) {
-    el.focus();
-    if (typeof window.getSelection != "undefined"
-            && typeof document.createRange != "undefined") {
-        var range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-    } else if (typeof document.body.createTextRange != "undefined") {
-        var textRange = document.body.createTextRange();
-        textRange.moveToElementText(el);
-        textRange.collapse(false);
-        textRange.select();
-    }
-}
+		el.focus();
+		if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+			var range = document.createRange();
+			range.selectNodeContents(el);
+			range.collapse(false);
+			var sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}else if (typeof document.body.createTextRange != "undefined") {
+			var textRange = document.body.createTextRange();
+			textRange.moveToElementText(el);
+			textRange.collapse(false);
+			textRange.select();
+		}
+	}
 	
 	return Seed.extend({
 
@@ -41,10 +40,10 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			this.cases = [this.box,this.logoBox];
 
 			this.on('selection', function (logoOrPic) {
-				if(logoOrPic === 'logo'){
+				if(logoOrPic === 'logo') {
 					this.box.selected = false;
 					this.logoBox.selected = true;
-				}else{
+				}else {
 					this.logoBox.selected = false;
 					this.box.selected = true;
 				}
@@ -80,35 +79,35 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			}, scp)
 
 
-				this.menu = new Selectbox({
-					choices : options.choices,
-					change : function(choice) {
-						this.fire('slide:changedLayout',choice.id);
-					}.bind(this),
+			this.menu = new Selectbox({
+				choices : options.choices,
+				change : function(choice) {
+					this.fire('slide:changedLayout',choice.id);
+				}.bind(this),
 
 			def : options.layoutType // l'identifiant de la valeur par défaut
 		})
 
-				this.menu.fake.className += " " + options.layoutType;
-				this.menu.trigger.className += " " + options.layoutType;
-				this.menu.up();
-				
-				this.el.appendChild(this.menu.el);
+			this.menu.fake.className += " " + options.layoutType;
+			this.menu.trigger.className += " " + options.layoutType;
+			this.menu.up();
 
-				this.menu.opened = false
-				this.menu.trigger.onclick = function(e) {
-					e.preventDefault();
-					if(!this.menu.opened){
-						this.menu.down();
-						this.menu.opened = true;
-					}else{
-						this.menu.up();
-						this.menu.opened = false;
-					}
-				}.bind(this);
+			this.el.appendChild(this.menu.el);
 
-				this.menu.fake.className += " " + options.layoutType;
-				this.menu.trigger.className += " " +options.layoutType;
+			this.menu.opened = false
+			this.menu.trigger.onclick = function(e) {
+				e.preventDefault();
+				if(!this.menu.opened){
+					this.menu.down();
+					this.menu.opened = true;
+				}else{
+					this.menu.up();
+					this.menu.opened = false;
+				}
+			}.bind(this);
+
+			this.menu.fake.className += " " + options.layoutType;
+			this.menu.trigger.className += " " +options.layoutType;
 
 			if(this.type === 'comment') {
 
@@ -194,7 +193,7 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 			}.bind(this))
 		},
 
-		addLine : function (e,textBP){
+		addLine : function (e,textBP) {
 			if(e.keyCode === 13){
 				this.nbLines++;
 				this.index = Date.now();
@@ -259,26 +258,23 @@ sand.define('Slide',['Case','ressources/Selectbox'], function (r) {
 		},
 
 		load : function (bulletPoints) {
-			if(!jQuery.isEmptyObject(bulletPoints)){
+			if(!jQuery.isEmptyObject(bulletPoints)) {
 				for(var k in bulletPoints)	{
 					this.addLine({keyCode : 13},bulletPoints[k])		
 				}
-			} else {
-					this.addLine({keyCode : 13})
+			}else {
+				this.addLine({keyCode : 13})
 			}
-
-
 		},
 
 		noBulletPoint : function () {
-			for( var i = 0, n = this.bulletPoint.childNodes.length; i < n; i++ ){
-					this.bulletPoint.removeChild(this.bulletPoint.childNodes[0]);
-				}
+			for( var i = 0, n = this.bulletPoint.childNodes.length; i < n; i++ ) {
+				this.bulletPoint.removeChild(this.bulletPoint.childNodes[0]);
+			}
 		},
 
 		setColor : function (color) {
 			this.el.children[1].style.color = color;
 		},
-
 	})
 })

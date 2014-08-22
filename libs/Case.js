@@ -14,18 +14,6 @@ sand.define('Case',["Geo/*"], function (r) {
 		if (c === l) callback();
 	}
 
-	r.Geo.Seg.prototype.nonStrictContains = function(p) {
-		return ((this.c1 <= p) && (p <= this.c2));
-	}
-
-	r.Geo.Rect.prototype.nonStrictContains = function(p) {
-		return (this.segX.nonStrictContains(p[0]) && this.segY.nonStrictContains(p[1]));
-	}
-
-	r.Geo.Rect.prototype.nonStrictIsIn = function(r) { // should and can be optimised
-      return (r.nonStrictContains.bind(r).for(this.getPoints()));
-    }
-
 	return Seed.extend({
 		'+options' : {
 			type : 'img',
@@ -99,7 +87,7 @@ sand.define('Case',["Geo/*"], function (r) {
 					this.setColor(color);
 				}.bind(this));
 
-			} else if (this.type === 'img') {
+			}else if (this.type === 'img') {
 				
 				this.div.appendChild(this.img);
 				this.clicking;
@@ -112,7 +100,7 @@ sand.define('Case',["Geo/*"], function (r) {
 					this.clicking = true;
 				}.bind(this)
 				
-				document.body.addEventListener("mouseup", function (e) {
+				addEventListener("mouseup", function (e) {
 					this.clicking = false;
 				}.bind(this))
 
@@ -132,7 +120,8 @@ sand.define('Case',["Geo/*"], function (r) {
 							this.zoom(factor);
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
-						} else if (this.fit) {
+						}else if (this.fit) {
+							
 							if(!(Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
 							this.imgRect.setCenter(this.divRect.getCenter())
 							this.staticPoint = this.imgCenter
@@ -142,6 +131,7 @@ sand.define('Case',["Geo/*"], function (r) {
 							}else {
 								this.zoom(factor);
 							}
+
 						}
 					}
 				}.bind(this))
@@ -155,11 +145,13 @@ sand.define('Case',["Geo/*"], function (r) {
 						var deltaY = e.clientY- this.img.height/2 - this.posClick[1];
 						var delta = [deltaX,deltaY];
 						this.potentialRect = this.imgRect.move({vector : delta});
+						
 						if ( (Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
 							this.img.style.left = (parseInt(this.img.style.left) + deltaX) + 'px';
 							this.img.style.top = (parseInt(this.img.style.top) + deltaY) + 'px';
 							this.imgRect = this.potentialRect;
 						}
+						
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
@@ -167,7 +159,7 @@ sand.define('Case',["Geo/*"], function (r) {
 					this.posClick[1] = e.clientY- this.img.height/2;
 				}.bind(this)
 
-				document.body.addEventListener("mousemove", this.div.onmousemove )
+				addEventListener("mousemove", this.div.onmousemove )
 
 				this.loadCase(true);
 				
@@ -199,13 +191,13 @@ sand.define('Case',["Geo/*"], function (r) {
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image
 			var loading = function () {
 
-				if(this.pos){
+				if(this.pos) {
 					this.ratio = parseInt(this.img.naturalHeight)/parseInt(this.img.naturalWidth);
 					this.img.style.width = this.pos[2] + 'px';
 					this.img.style.height = this.pos[3] + 'px';
 					this.img.style.left = this.pos[0] + 'px';
 					this.img.style.top = this.pos[1] + 'px';
-				} else {
+				}else {
 					this.img.style.height = this.img.naturalHeight + 'px';
 					this.img.style.width = this.img.naturalWidth + 'px';
 					this.img.style.left = 0 + 'px';
@@ -220,12 +212,10 @@ sand.define('Case',["Geo/*"], function (r) {
 					if (this.ratio > ratioDiv) {
 						this.img.style.width = width  + 'px';
 						this.img.style.height = width*this.ratio + 'px';
-					}
-					else {
+					}else {
 						this.img.style.height = height + 'px';
 						this.img.style.width = height/this.ratio + 'px';
 					}
-
 				}
 
 				var imgX = parseInt(this.img.style.left);
@@ -243,7 +233,7 @@ sand.define('Case',["Geo/*"], function (r) {
 
 			}.bind(this);
 
-			if(!firstLoad){
+			if(!firstLoad) {
 				loading();
 			}
 			else  onimagesload([this.img], loading); 
