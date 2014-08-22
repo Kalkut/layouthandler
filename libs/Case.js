@@ -14,6 +14,18 @@ sand.define('Case',["Geo/*"], function (r) {
 		if (c === l) callback();
 	}
 
+	r.Geo.Seg.prototype.nonStrictContains = function(p) {
+		return ((this.c1 <= p) && (p <= this.c2));
+	}
+
+	r.Geo.Rect.prototype.nonStrictContains = function(p) {
+		return (this.segX.nonStrictContains(p[0]) && this.segY.nonStrictContains(p[1]));
+	}
+
+	r.Geo.Rect.prototype.nonStrictIsIn = function(r) { // should and can be optimised
+      return (r.nonStrictContains.bind(r).for(this.getPoints()));
+    }
+
 	return Seed.extend({
 		'+options' : {
 			type : 'img',
@@ -85,7 +97,6 @@ sand.define('Case',["Geo/*"], function (r) {
 				this.z = 0;
 
 				this.div.onmousedown = function (e) {
-					e.preventDefault();
 					this.clicking = true;
 				}.bind(this)
 				
@@ -105,8 +116,8 @@ sand.define('Case',["Geo/*"], function (r) {
 						this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft,e.clientY - this.div.offsetTop]); //origine du referentiel du zoom = curseur
 						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
 						
-						//if( (!this.fit && (( this.potentialRect.segX.length() >= parseInt(this.div.style.width) ) && ( this.potentialRect.segY.length() >= parseInt(this.div.style.height) ) ) ) ) {
-						if ((this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
+						if( (!this.fit && (( this.potentialRect.segX.length() >= this.divRect.segX.length() ) && ( this.potentialRect.segY.length() >= this.divRect.segY.length() ) ) ) ) {
+						//if ((this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
 							this.zoom(factor);
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
@@ -121,24 +132,19 @@ sand.define('Case',["Geo/*"], function (r) {
 				}.bind(this))
 
 				this.div.onmousemove = function (e) {
-					this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft, e.clientY - this.div.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]));
-					this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
-					var deltaX = e.clientX - this.img.width/2 - this.posClick[0];
-					var deltaY = e.clientY- this.img.height/2 - this.posClick[1];
-					var delta = [deltaX,deltaY];
-					this.potentialRect = this.imgRect.move({vector : delta});
+					
 					if(this.clicking && !this.frozen) {
-						if (/*!this.fit &&*/ (this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height))) {
+						this.staticPoint = new r.Geo.Point([e.clientX - this.div.offsetLeft, e.clientY - this.div.offsetTop].add([document.body.scrollLeft, document.body.scrollTop]));
+						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);
+						var deltaX = e.clientX - this.img.width/2 - this.posClick[0];
+						var deltaY = e.clientY- this.img.height/2 - this.posClick[1];
+						var delta = [deltaX,deltaY];
+						this.potentialRect = this.imgRect.move({vector : delta});
+						if ( (Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
 							this.img.style.left = (parseInt(this.img.style.left) + deltaX) + 'px';
-							this.img.style.top = parseInt(this.img.style.top) + deltaY + 'px';
+							this.img.style.top = (parseInt(this.img.style.top) + deltaY) + 'px';
 							this.imgRect = this.potentialRect;
-						}/*else if (this.fit) {
-							//this.img.style.left = Math.max(Math.min(parseInt(this.div.style.width),parseInt(this.img.style.left) + deltaX),-Math.min(parseInt(this.div.style.width)));
-							//this.img.style.top = Math.max(Math.min(parseInt(this.div.style.height),parseInt(this.img.style.top) + deltaY),-Math.min(parseInt(this.div.style.height)));
-							this.img.style.left = parseInt(this.img.style.left) + deltaX;
-							this.img.style.top = parseInt(this.img.style.top) + deltaY;
-							this.imgRect = this.potentialRect;
-						}*/
+						}
 						this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 						this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 					}
@@ -155,15 +161,24 @@ sand.define('Case',["Geo/*"], function (r) {
 
 		zoom : function (factor) {// Merci Geo !
 			this.imgRect = this.imgRect.move({staticPoint : this.staticPoint, scale : factor});
-			
-			/*if ( !(this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
-				this.imgRect = this.imgRect.forcedIn(new r.Geo.Rect({ p1 : [parseInt(this.img.style.left),parseInt(this.img.style.top)], p2 : [parseInt(this.div.style.width),parseInt(this.div.style.height)]}))
-			}*/
-
 			this.img.style.width = this.imgRect.segX.getLength() + 'px';
 			this.img.style.height = this.imgRect.segY.getLength() + 'px';
 			this.img.style.left =  this.imgRect.segX.c1 + 'px';
 			this.img.style.top = this.imgRect.segY.c1 + 'px';
+
+			if (!(this.imgRect.segX.c2 >= this.divRect.segX.c2 && this.imgRect.segX.c1 <= this.divRect.segX.c1 && this.imgRect.segY.c1 <= this.divRect.segY.c1 && this.imgRect.segY.c2 >= this.divRect.segY.c2)){
+				var fitImg = this.divRect.move({staticPoint : this.staticPoint}).forcedIn(this.imgRect);
+				console.log('verif')
+				
+				 this.imgRect.segX.c1 = this.imgRect.segX.c1 - fitImg.segX.c1;
+				 this.img.style.left =  this.imgRect.segX.c1 + 'px'; 
+				 this.imgRect.segY.c1 = this.imgRect.segY.c1 - fitImg.segY.c1;
+				 this.img.style.top =  this.imgRect.segY.c1 + 'px';
+				 this.imgRect.segY.c2 = this.imgRect.segY.c1 + parseInt(this.img.style.height);
+				 this.imgRect.segX.c2 = this.imgRect.segX.c1 + parseInt(this.img.style.width);
+			}
+			
+
 		},
 
 		loadCase : function (firstLoad) {//methode permettant d'initialiser la position de l'image
@@ -207,8 +222,8 @@ sand.define('Case',["Geo/*"], function (r) {
 				var segDivX = new r.Geo.Seg(0, width);
 				var segDivY = new r.Geo.Seg(0, height);
 
-				this.imgRect = new r.Geo.Rect({ segX : segX, segY : segY, ref : new r.Geo.Ref({ origin : [imgX,imgY], factor : 1})});
-				this.divRect = new r.Geo.Rect({ segX : segDivX, segY : segDivY});
+				this.divRect = new r.Geo.Rect({ segX : segDivX, segY : segDivY });
+				this.imgRect = new r.Geo.Rect({ segX : segX, segY : segY});
 				this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 
 			}.bind(this);
