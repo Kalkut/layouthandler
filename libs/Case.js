@@ -97,6 +97,7 @@ sand.define('Case',["Geo/*"], function (r) {
 				this.z = 0;
 
 				this.div.onmousedown = function (e) {
+					e.preventDefault()
 					this.clicking = true;
 				}.bind(this)
 				
@@ -117,16 +118,19 @@ sand.define('Case',["Geo/*"], function (r) {
 						this.staticPoint = this.staticPoint.inRef(this.imgRect.ref);//on dilate l'image en conservant statique la position du curseur -> on passe au référentiel de l'image
 						
 						if( (!this.fit && (( this.potentialRect.segX.length() >= this.divRect.segX.length() ) && ( this.potentialRect.segY.length() >= this.divRect.segY.length() ) ) ) ) {
-						//if ((this.potentialRect.segX.c2 >= parseInt(this.div.style.width) && this.potentialRect.segX.c1 <= 0 && this.potentialRect.segY.c1 <= 0 && this.potentialRect.segY.c2 >= parseInt(this.div.style.height) ) ) {
 							this.zoom(factor);
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
 						} else if (this.fit) {
-							this.imgRect.setCenter(this.imgCenter)
-							if( ( this.potentialRect.segX.length() <= parseInt(this.div.style.width) ) || ( this.potentialRect.segY.length() <= parseInt(this.div.style.height) ) ) this.staticPoint = this.imgCenter;
+							if(!(Math.ceil(this.potentialRect.segX.c2) >= this.divRect.segX.c2 && Math.floor(this.potentialRect.segX.c1) <= this.divRect.segX.c1 && Math.floor(this.potentialRect.segY.c1) <= this.divRect.segY.c1 && Math.ceil(this.potentialRect.segY.c2) >= this.divRect.segY.c2 ) ) {
+							this.imgRect.setCenter(this.divRect.getCenter())
+							this.staticPoint = this.imgCenter
 							this.zoom(factor);
 							this.fire('case:imageMovedPx',this.img.style.left,this.img.style.top,this.img.style.width,this.img.style.height);
 							this.fire('case:imageMovedInt',parseInt(this.img.style.left),parseInt(this.img.style.top),parseInt(this.img.style.width),parseInt(this.img.style.height));
+							}else {
+								this.zoom(factor);
+							}
 						}
 					}
 				}.bind(this))
@@ -166,7 +170,7 @@ sand.define('Case',["Geo/*"], function (r) {
 			this.img.style.left =  this.imgRect.segX.c1 + 'px';
 			this.img.style.top = this.imgRect.segY.c1 + 'px';
 
-			if (!(this.imgRect.segX.c2 >= this.divRect.segX.c2 && this.imgRect.segX.c1 <= this.divRect.segX.c1 && this.imgRect.segY.c1 <= this.divRect.segY.c1 && this.imgRect.segY.c2 >= this.divRect.segY.c2)){
+			if (!this.fit && !(this.imgRect.segX.c2 >= this.divRect.segX.c2 && this.imgRect.segX.c1 <= this.divRect.segX.c1 && this.imgRect.segY.c1 <= this.divRect.segY.c1 && this.imgRect.segY.c2 >= this.divRect.segY.c2)){
 				var fitImg = this.divRect.move({staticPoint : this.staticPoint}).forcedIn(this.imgRect);
 				console.log('verif')
 				
